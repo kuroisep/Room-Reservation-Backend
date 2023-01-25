@@ -23,6 +23,10 @@ app.use('/calendar', calendar);
 app.use('/requests', manageRequests);
 app.use('/org', manageOrg);
 
+app.get("/", (req, res) => {
+    res.json({ result: "ok" })
+})
+
 mongoose.connect("mongodb+srv://databaseAdmin:admin000@cluster0.fn3kdvx.mongodb.net/?retryWrites=true&w=majority"
     , { useNewUrlParser: true },
     () => console.log('Connect to DB'));
