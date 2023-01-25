@@ -1,0 +1,67 @@
+const { application } = require('express');
+const express = require('express');
+const router = express.Router();
+const RoomsModel = require('../models/Rooms')
+
+router.post('/addroom', async (req, res) => {
+    const id_room = req.body.id_room
+    const Name = req.body.Name
+    const Detail = req.body.Detail
+    const Contributer = req.body.Contributer
+    const Building = req.body.Building
+
+
+    const Rooms = new RoomsModel({
+        id_room: id_room,
+        Name: Name,
+        Detail: Detail,
+        Contributer: Contributer,
+        Building: Building,
+    });
+
+    await Rooms.save();
+    res.send('Success')
+});
+
+
+router.get('/readroom', async (req, res) => {
+    RoomsModel.find({}, (err, result) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(result)
+        }
+    })
+})
+
+
+router.put("/updateroom", async(req,res) =>{
+     const newAge = req.body.newAge;
+     const id = req.body.id;
+     console.log(newAge,id);
+
+     try{
+         await UsersModel.findById(id, (error, friendToUpdate) => {
+             friendToUpdate.age = Number(newAge);
+             friendToUpdate.save();
+         });
+     } catch (err) {
+         console.log(err);
+     }
+
+     res.send("updated");
+})
+
+router.delete('/deleteroom/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        await RoomsModel.findByIdAndRemove(id).exec()
+        res.send("itemdeleted");
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+})
+
+module.exports = router;
