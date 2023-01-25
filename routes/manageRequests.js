@@ -2,7 +2,7 @@ const { application } = require('express');
 const express = require('express');
 const router = express.Router();
 const RequestsModel = require('../models/Requests')
-const auth = require('./middleware/auth')
+const auth = require('../middleware/auth')
 
 router.post('/', async (req, res) => {
     const Room = req.body.Room
