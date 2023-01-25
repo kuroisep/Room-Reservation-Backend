@@ -1,36 +1,31 @@
 const mongoose = require('mongoose')
 
 const RequestSchema = new mongoose.Schema({
-    ID_Room : {
-        type : String,
-        required : true
-    },
-    Name_User : {
+    Room: {
         type: String,
-        required : true,
+        required: true
     },
-    Participant : {
-        type: Number,
-        required : true,
-    },
-    Equipment : {
+    UserID: {
         type: String,
-        required : true,
+        required: true,
     },
-    Date_Reserve : {
+    Equipment: {
+        type: [],
+        required: true,
+    },
+    Date_Reserve: {
+        type: Array,
+        default: [Date]
+    },
+    Status_Approve: {
         type: String,
-        required : true,
+        default: "Unapproved"
     },
-    Status_Approve : {
-        type: Boolean,
-        required : true,
+    Seat: {
+        type: String,
     }
-    
-    
-    
+}, { timestamp: true });
 
-});
-
-const RequestsModel = mongoose.model('requests',RequestSchema)
+const RequestsModel = mongoose.model('requests', RequestSchema)
 
 module.exports = RequestsModel;

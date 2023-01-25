@@ -1,32 +1,45 @@
 const mongoose = require('mongoose')
+const Building = require('../models/Building')
 
 const RoomSchema = new mongoose.Schema({
-    id_room : {
+    Name: {
         type: String,
-        required : true,
+        required: true,
     },
-    Name : {
+    Detail: {
         type: String,
-        required : true,
+        required: true,
     },
-    Detail : {
+    Contributor: {
         type: String,
-        required : true,
+        required: true,
     },
-    Contributer : {
-        type: String,
-        required : true,
-    },
-    Building : {
-        type: String,
-        required : true,
-    },
-    
-    
-    
 
+    RoomType: {
+        type: String,
+        required: true,
+    },
+
+    Building: {
+        type: String,
+        required: true
+    },
+
+    Seat: {
+        type: Number,
+        required: true,
+    },
+
+    Size: {
+        type: String,
+        required: true,
+    },
+
+    Equipment: {
+        type: [],
+    },
 });
 
-const RoomsModel = mongoose.model('rooms',RoomSchema)
+const RoomsModel = mongoose.model('rooms', RoomSchema)
 
 module.exports = RoomsModel;

@@ -12,12 +12,19 @@ app.use(express.json());
 const manageUser = require('./routes/manageUser');
 const manageRooms = require('./routes/manageRooms');
 const authentication = require('./routes/auth');
+const calendar = require('./routes/calendar');
+const manageRequests = require('./routes/manageRequests');
+const manageOrg = require('./routes/manageOrg');
 
-app.use('/manageUsers', manageUser);
-app.use('/manageRooms', manageRooms);
+app.use('/users', manageUser);
+app.use('/rooms', manageRooms);
+app.use('/auth', authentication);
+app.use('/calendar', calendar);
+app.use('/requests', manageRequests);
+app.use('/org', manageOrg);
 
 mongoose.connect("mongodb+srv://databaseAdmin:admin000@cluster0.fn3kdvx.mongodb.net/?retryWrites=true&w=majority"
-    , { useNewUrlParser: true }, 
+    , { useNewUrlParser: true },
     () => console.log('Connect to DB'));
 
 app.listen(3001, () => {
