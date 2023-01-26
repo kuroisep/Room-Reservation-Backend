@@ -31,6 +31,7 @@ mongoose.connect("mongodb+srv://databaseAdmin:admin000@cluster0.fn3kdvx.mongodb.
     , { useNewUrlParser: true },
     () => console.log('Connect to DB'));
 
-app.listen(3001, () => {
-    console.log('You are connected!');
-})
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running. ${PORT}`);
+});
