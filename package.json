@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "npm run build"
+    "start": "node index.js"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
