@@ -1,5 +1,6 @@
 const { application } = require('express');
 const express = require('express');
+const jwt = require('jsonwebtoken')
 const { model } = require('mongoose');
 const router = express.Router();
 const UsersModel = require('../models/Users');
@@ -173,6 +174,24 @@ router.get('/searchby', (req, res) => {
         .then(data => {
             res.send(data)
         })
+})
+
+router.get('/:userId', (req, res) => {
+    if (req.headers && req.headers.authorization) {
+        var authorization = req.headers.authorization.split(' ')[1], decoded;
+        console.log(authorization)
+
+        try {
+            decoded = jwt.verify(authorization)
+        } catch (e) {
+            return res.status(401).send('unauthorized');
+        }
+
+        var userId = decoded._id;
+        UsersModel.findOne({ _id: userId }).then(function (user) {
+            return res.send(200);
+        });
+    }
 })
 
 module.exports = router;

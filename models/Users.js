@@ -31,6 +31,9 @@ const UserSchema = new mongoose.Schema({
     orgID: {
         type: String
     }
+    reqID: {
+        type: String
+    }
 });
 
 module.exports = mongoose.model('users', UserSchema)
