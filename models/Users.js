@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
     },
     orgID: {
         type: String
-    }
+    },
     reqID: {
         type: String
     }
