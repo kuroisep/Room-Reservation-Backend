@@ -1,3 +1,4 @@
+const { number } = require('joi');
 const mongoose = require('mongoose')
 const Building = require('../models/Building')
 
@@ -6,7 +7,7 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    Detail: {
+    Purpose: {
         type: String,
         required: true,
     },
@@ -35,9 +36,13 @@ const RoomSchema = new mongoose.Schema({
         required: true,
     },
 
-    Equipment: {
+    Object: {
         type: [],
     },
+
+    useCount: {
+        type: Number,
+    }
 });
 
 const RoomsModel = mongoose.model('rooms', RoomSchema)
