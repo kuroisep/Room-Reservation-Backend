@@ -30,13 +30,14 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    try {
-        RequestsModel.find({}, function (err, requests) {
-            res.send(RequestsModel.toApiRequestModel(requests))
-        })
-    } catch (err) {
-        res.status(400).send(err);
-    }
+    RequestsModel.find({}, (err, result) => {
+        if (err) {
+            res.send(err)
+        }
+        else {
+            res.send(result)
+        }
+    })
 })
 
 router.put("/", async (req, res) => {

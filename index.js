@@ -15,6 +15,7 @@ const authentication = require('./routes/auth');
 const calendar = require('./routes/calendar');
 const manageRequests = require('./routes/manageRequests');
 const manageOrg = require('./routes/manageOrg');
+const static = require('./routes/static');
 
 app.use('/users', manageUser);
 app.use('/rooms', manageRooms);
@@ -22,6 +23,7 @@ app.use('/auth', authentication);
 app.use('/calendar', calendar);
 app.use('/requests', manageRequests);
 app.use('/org', manageOrg);
+app.use('/static', static)
 
 app.get("/", (req, res) => {
     res.json({ result: "ok" })
