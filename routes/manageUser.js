@@ -81,13 +81,13 @@ router.post('/', async (req, res) => {
     const first_name = req.body.firstname
     const last_name = req.body.lastname
     const email = req.body.Email
-    const statusID = Status.name
+    const status = Status.name
     const orgID = Organization.name
     const role = req.body.Role
     const profile = req.body.Profile
 
-    Status = await StatusModel.findbyId(req.body.statusID)
-    Organization = await OrgModel.findbyId(req.body.orgID)
+    Status = await StatusModel.findbyId(req.body.status)
+    Organization = await OrgModel.findbyId(req.body.org)
 
     const Users = new UsersModel({
         _id: new mongoose.Types.ObjectId(),
@@ -96,7 +96,7 @@ router.post('/', async (req, res) => {
         firstname: first_name,
         lastname: last_name,
         Email: email,
-        statusID: statusID,
+        status: status,
         Role: role,
         Profile: profile,
         orgID: orgID

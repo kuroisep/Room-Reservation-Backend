@@ -143,9 +143,9 @@ router.post('/room', async (req, res) => {
     const Seat = req.body.Seat
     const Size = req.body.Size
     const Equipment = req.body.Equipment
+    const useCount = req.body.useCount
 
     const Rooms = new RoomsModel({
-        _id: new mongoose.Types.ObjectId(),
         Name: Name,
         Detail: Detail,
         Contributor: Contributor,
@@ -153,7 +153,8 @@ router.post('/room', async (req, res) => {
         Building: Building,
         Seat: Seat,
         Size: Size,
-        Equipment: Equipment
+        Equipment: Equipment,
+        useCount: useCount
     });
 
     Build.roomID.push(Rooms._id.toString())

@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    statusID: {
+    status: {
         type: String
     },
     Role: {
@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema({
     Profile: {
         type: String
     },
-    orgID: {
+    org: {
         type: String
     },
     reqID: {

@@ -30,14 +30,12 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    RequestsModel.find({}, (err, result) => {
-        if (err) {
-            res.send(err)
-        }
-        else {
-            res.send(result)
-        }
+
+    let result = await RequestsModel.find({}).select({
+        "Room": 1,
+        "UserID": 1
     })
+    res.send(result)
 })
 
 router.put("/", async (req, res) => {

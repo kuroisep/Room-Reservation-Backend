@@ -7,10 +7,6 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    Purpose: {
-        type: String,
-        required: true,
-    },
     Contributor: {
         type: String,
         required: true,

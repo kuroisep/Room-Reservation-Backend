@@ -4,11 +4,24 @@ const router = express.Router();
 const RequestsModel = require('../models/Requests')
 const RoomModel = require('../models/Rooms')
 
-router.get('/getRecord', async (req, res) => {
+router.get('/', async (req, res) => {
+
     try {
-        RoomModel.find({}).sort({ useCount: 1 }).exec()
+        RoomModel.find({}).sort({ useCount: -1 }).exec((err, docs) => {
+            if (err) {
+                responseObj = {
+                    "status": "error"
+                }
+                res.status(500).send(responseObj);
+            } else {
+                responseObj = {
+                    "body": docs
+                }
+                res.status(200).send(responseObj)
+            }
+        })
     } catch (err) {
-        console.log(err)
+        res.send(err);
     }
 })
 

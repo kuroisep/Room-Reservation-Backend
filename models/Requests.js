@@ -17,6 +17,10 @@ const RequestSchema = new mongoose.Schema({
         type: Array,
         default: [Date]
     },
+    Purpose: {
+        type: String,
+        required: true
+    },
     Status_Approve: {
         type: String,
         default: "Unapproved"
@@ -26,17 +30,6 @@ const RequestSchema = new mongoose.Schema({
     }
 }, { timestamp: true });
 
-RequestSchema.static.toApiRequestModel = function (data) {
-    return data.map(function (request) {
-        return {
-            Room: request.Room,
-            UserID: request.UserID,
-            Date_Reserve: request.Date_Reserve,
-            Status_Approve: request.Status_Approve,
-            Seat: request.Seat
-        }
-    })
-}
 
 const RequestsModel = mongoose.model('requests', RequestSchema)
 
