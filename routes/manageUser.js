@@ -176,7 +176,7 @@ router.get('/searchby', (req, res) => {
         })
 })
 
-router.get('/:userId', (req, res) => {
+router.get('userId', (req, res) => {
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split(' ')[1], decoded;
         console.log(authorization)

@@ -92,4 +92,12 @@ router.get('/searchby', (req, res) => {
         })
 })
 
+router.get('/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    RequestsModel.find(({ _id: fetchid }), function (err, val) {
+        res.send(val);
+    })
+})
+
 module.exports = router

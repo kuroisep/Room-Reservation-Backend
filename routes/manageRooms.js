@@ -246,4 +246,31 @@ router.get('/searchby', (req, res) => {
         })
 })
 
+router.get('/building/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    BuildingModel.find(({ _id: fetchid }), function (err, val) {
+        if (err) {
+            res.send(err)
+        }
+        res.send(val);
+    })
+})
+
+router.get('/roomtype/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    RoomTypeModel.find(({ _id: fetchid }), function (err, val) {
+        res.send(val);
+    })
+})
+
+router.get('/room/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    RoomsModel.find(({ _id: fetchid }), function (err, val) {
+        res.send(val);
+    })
+})
+
 module.exports = router;

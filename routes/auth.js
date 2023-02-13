@@ -6,15 +6,15 @@ const jwt = require('jsonwebtoken');
 
 require("dotenv").config();
 
-router.post('/register', async(req,res) => {
+router.post('/register', async (req, res) => {
 
     //Validation
     const { error } = registerValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    
+
     //Check duplicate user
-    const emailExist = await User.findOne({Email: req.body.Email})
-    if(emailExist) return res.status(400).send('Email already exists');
+    const emailExist = await User.findOne({ Email: req.body.Email })
+    if (emailExist) return res.status(400).send('Email already exists');
 
     //Hash passwords
     const salt = await bcrypt.genSalt(10);
@@ -23,15 +23,21 @@ router.post('/register', async(req,res) => {
     //Create new user
     const user = new User({
         user: req.body.user,
+        pass: req.body.pass,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
         Email: req.body.Email,
-        pass: hashedPassword
+        status: req.body.status,
+        Role: req.body.Role,
+        Profile: req.body.Profile,
+        org: req.body.org
     });
 
-    try{
+    try {
         const savedUser = await user.save();
         res.send({ user: user._id });
-    }catch(err){
-        res.status(400).send(err)   
+    } catch (err) {
+        res.status(400).send(err)
     }
 });
 
@@ -41,13 +47,13 @@ router.post('/login', async (req, res) => {
     const { error } = loginValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const user = await User.findOne({Email: req.body.Email})
-    if(!user) return res.status(400).send('Email is not found');
+    const user = await User.findOne({ Email: req.body.Email })
+    if (!user) return res.status(400).send('Email is not found');
     //Password is correct?
     const validPass = await bcrypt.compare(req.body.pass, user.pass);
-    if(!validPass) return res.status(400).send('Invalid Password');
+    if (!validPass) return res.status(400).send('Invalid Password');
     else {
-        const token = jwt.sign({_id : user._id}, process.env.TOKEN_SECRET);
+        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
         res.header('auth-token', token).send(token);
     }
 

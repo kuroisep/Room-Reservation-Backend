@@ -30,9 +30,6 @@ const UserSchema = new mongoose.Schema({
     },
     org: {
         type: String
-    },
-    reqID: {
-        type: String
     }
 });
 
