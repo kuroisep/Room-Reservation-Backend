@@ -7,6 +7,18 @@ const UsersModel = require('../models/Users');
 const StatusModel = require('../models/Status');
 const OrgModel = require('../models/Org');
 const mongoose = require('mongoose');
+const multer = require('multer');
+
+var storage = multer.diskStorage({
+    destination: (req, res, cb) => {
+        cb(null, 'uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.filename)
+    }
+});
+
+var upload = multer({ storage: storage });
 
 router.post('/status', async (req, res) => {
     const priority = req.body.priority
@@ -98,8 +110,11 @@ router.post('/', async (req, res) => {
         Email: email,
         status: status,
         Role: role,
-        Profile: profile,
-        orgID: orgID
+        orgID: orgID,
+        image: {
+            data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)),
+            contentType: 'image/png'
+        }
     });
 
     Organization.userID.push(Users._id.toString())
@@ -117,6 +132,7 @@ router.get('/', async (req, res) => {
         if (err) {
             res.send(err)
         } else {
+            res.render('imagesPage', { result: result });
             res.send(result)
         }
     })

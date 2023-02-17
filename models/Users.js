@@ -25,8 +25,9 @@ const UserSchema = new mongoose.Schema({
     Role: {
         type: String
     },
-    Profile: {
-        type: String
+    img: {
+        data: Buffer,
+        contentType: String
     },
     org: {
         type: String
