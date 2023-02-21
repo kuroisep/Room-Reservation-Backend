@@ -11,6 +11,8 @@ router.post('/', async (req, res) => {
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
     const Seat = req.body.Seat
+    const Object = req.body.Object
+    const Purpose = req.body.Purpose
 
     const Requests = new RequestsModel({
         Room: Room,
@@ -18,7 +20,9 @@ router.post('/', async (req, res) => {
         Equipment: Equipment,
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
-        Seat: Seat
+        Seat: Seat,
+        Object: Object,
+        Purpose: Purpose
     });
 
     try {
@@ -85,8 +89,9 @@ router.get('/search/:key', async (req, res) => {
 })
 
 router.get('/searchby', (req, res) => {
-    const searchedField = req.query.Status_Approve;
-    RequestsModel.find({ Status_Approve: { $regex: searchedField, $options: '$i' } })
+    const searchedField = req.query.UserID;
+    RequestsModel.find(
+        { UserID: { $regex: searchedField, $options: '$i' } })
         .then(data => {
             res.send(data)
         })
