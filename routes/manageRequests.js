@@ -2,11 +2,14 @@ const { application } = require('express');
 const express = require('express');
 const router = express.Router();
 const RequestsModel = require('../models/Requests')
+const UserModel = require('../models/Users');
 const auth = require('../middleware/auth')
 
 router.post('/', async (req, res) => {
+    const User = await UserModel.findById(req.body.UserID)
+
     const Room = req.body.Room
-    const UserID = req.body.UserID
+    const UserID = User.user
     const Equipment = req.body.Equipment
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve

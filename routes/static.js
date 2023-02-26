@@ -7,19 +7,23 @@ const RoomModel = require('../models/Rooms')
 router.get('/', async (req, res) => {
 
     try {
-        RoomModel.find({}).sort({ useCount: -1 }).exec((err, docs) => {
-            if (err) {
-                responseObj = {
-                    "status": "error"
+        RoomModel.find({}).sort({ useCount: -1 })
+            .select({
+                "Name": 1,
+                "useCount": 1
+            }).exec((err, docs) => {
+                if (err) {
+                    responseObj = {
+                        "status": "error"
+                    }
+                    res.status(500).send(responseObj);
+                } else {
+                    responseObj = {
+                        "body": docs
+                    }
+                    res.status(200).send(responseObj)
                 }
-                res.status(500).send(responseObj);
-            } else {
-                responseObj = {
-                    "body": docs
-                }
-                res.status(200).send(responseObj)
-            }
-        })
+            })
     } catch (err) {
         res.send(err);
     }
