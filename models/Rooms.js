@@ -38,6 +38,10 @@ const RoomSchema = new mongoose.Schema({
 
     useCount: {
         type: Number,
+    },
+
+    image: {
+        type: String
     }
 });
 

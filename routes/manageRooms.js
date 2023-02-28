@@ -177,6 +177,7 @@ router.post('/room', async (req, res) => {
     const Size = req.body.Size
     const Equipment = req.body.Equipment
     const useCount = req.body.useCount
+    const image = req.body.image
 
     const Rooms = new RoomsModel({
         Name: Name,
@@ -187,7 +188,8 @@ router.post('/room', async (req, res) => {
         Seat: Seat,
         Size: Size,
         Equipment: Equipment,
-        useCount: useCount
+        useCount: useCount,
+        image: image
     });
 
     Build.roomID.push(Rooms._id.toString())
