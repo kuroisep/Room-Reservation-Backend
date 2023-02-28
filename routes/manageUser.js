@@ -96,7 +96,7 @@ router.post('/', async (req, res) => {
     const status = Status.name
     const orgID = Organization.name
     const role = req.body.Role
-    const profile = req.body.Profile
+    const image = req.body.image
 
     Status = await StatusModel.findbyId(req.body.status)
     Organization = await OrgModel.findbyId(req.body.org)

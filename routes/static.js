@@ -18,10 +18,7 @@ router.get('/', async (req, res) => {
                     }
                     res.status(500).send(responseObj);
                 } else {
-                    responseObj = {
-                        "body": docs
-                    }
-                    res.status(200).send(responseObj)
+                    res.status(200).send(docs)
                 }
             })
     } catch (err) {
