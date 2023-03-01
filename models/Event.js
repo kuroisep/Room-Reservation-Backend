@@ -9,13 +9,15 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    Equipment: {
+    Object: {
         type: [],
         required: true,
     },
     Date_Reserve: {
         type: Date,
-        default: Date.now,
+    },
+    Purpose: {
+        type: String,
     },
     Status_Approve: {
         type: String,
@@ -26,6 +28,6 @@ const EventSchema = new mongoose.Schema({
     }
 }, { timestamp: true });
 
-const EventModel = mongoose.model('requests', EventSchema)
+const EventModel = mongoose.model('events', EventSchema)
 
 module.exports = EventModel;

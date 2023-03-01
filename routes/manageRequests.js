@@ -1,7 +1,8 @@
 const { application } = require('express');
 const express = require('express');
 const router = express.Router();
-const RequestsModel = require('../models/Requests')
+const RequestsModel = require('../models/Requests');
+const EventModel = require('../models/Event');
 const UserModel = require('../models/Users');
 const auth = require('../middleware/auth')
 
@@ -10,7 +11,6 @@ router.post('/', async (req, res) => {
 
     const Room = req.body.Room
     const UserID = User.user
-    const Equipment = req.body.Equipment
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
     const Seat = req.body.Seat
@@ -20,7 +20,6 @@ router.post('/', async (req, res) => {
     const Requests = new RequestsModel({
         Room: Room,
         UserID: UserID,
-        Equipment: Equipment,
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
         Seat: Seat,
@@ -33,6 +32,20 @@ router.post('/', async (req, res) => {
         res.send('Success')
     } catch (err) {
         res.status(400).send(err);
+    }
+
+    for (let i = 0; i < Date_Reserve.length; i++) {
+        const Event = new EventModel({
+            Room: Room,
+            UserID: UserID,
+            Date_Reserve: Date_Reserve[i],
+            Status_Approve: Status_Approve,
+            Seat: Seat,
+            Object: Object,
+            Purpose: Purpose
+        })
+        //  console.log(Date_Reserve[i])
+        await Event.save();
     }
 })
 
