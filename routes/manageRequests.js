@@ -51,11 +51,13 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
 
-    let result = await RequestsModel.find({}).select({
-        "Room": 1,
-        "UserID": 1
+    RequestsModel.find({}, (err, result) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(result)
+        }
     })
-    res.send(result)
 })
 
 router.put("/", async (req, res) => {
