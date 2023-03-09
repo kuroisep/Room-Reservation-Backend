@@ -4,12 +4,15 @@ const router = express.Router();
 const RequestsModel = require('../models/Requests');
 const EventModel = require('../models/Event');
 const UserModel = require('../models/Users');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
+const RoomModel = require('../models/Rooms');
 
 router.post('/', async (req, res) => {
     const User = await UserModel.findById(req.body.UserID)
+    const Rooms = await RoomModel.findById(req.body.Room)
 
-    const Room = req.body.Room
+    const Room = Rooms.Name
+    const Building = Rooms.Building
     const UserID = User.user
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
@@ -19,6 +22,7 @@ router.post('/', async (req, res) => {
 
     const Requests = new RequestsModel({
         Room: Room,
+        Building: Building,
         UserID: UserID,
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
@@ -37,6 +41,7 @@ router.post('/', async (req, res) => {
     for (let i = 0; i < Date_Reserve.length; i++) {
         const Event = new EventModel({
             Room: Room,
+            Building: Building,
             UserID: UserID,
             Date_Reserve: Date_Reserve[i],
             Status_Approve: Status_Approve,

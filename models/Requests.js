@@ -5,6 +5,9 @@ const RequestSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    Building: {
+        type: String
+    },
     UserID: {
         type: String,
         required: true,
