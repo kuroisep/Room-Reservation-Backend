@@ -14,7 +14,7 @@ const BuildingSchema = new mongoose.Schema({
     roomID: {
         type: []
     },
-    orgID: {
+    org: {
         type: String
     }
 })

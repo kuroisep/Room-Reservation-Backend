@@ -42,16 +42,18 @@ function paginatedResults(model) {
 
 router.post('/building', async (req, res) => {
 
-    const Organization = await OrgModel.findById(req.body.id)
+    const Organization = await OrgModel.findById(req.body.org)
 
     const name = req.body.name
     const roomType = req.body.roomType
     const roomID = req.body.roomID
+    const org = Organization.name
 
     const Building = new BuildingModel({
         name: name,
         roomType: roomType,
-        roomID: roomID
+        roomID: roomID,
+        org: org
     });
 
     await Building.save();
