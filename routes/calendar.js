@@ -1,10 +1,11 @@
 const { application } = require('express');
 const express = require('express');
 const router = express.Router();
-const RequestsModel = require('../models/Requests')
+const EventModel = require('../models/Event')
+const auth = require('../middleware/auth')
 
 router.get('/', async (req, res) => {
-    RequestsModel.find({}, (err, result) => {
+    EventModel.find({}, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -13,21 +14,12 @@ router.get('/', async (req, res) => {
     })
 })
 
-/*router.put("/", async (req, res) => {
-    const newreq = req.body.newreq;
-    const id = req.body.id;
-    console.log(newreq, id);
-
-    try {
-        await Request.findById(id, (error, friendToUpdate) => {
-            res.n = newname;
-            BuildingModel.save();
-        });
-    } catch (err) {
-        console.log(err);
-    }
-
-    res.send("updated");
-})*/
+router.get('/searchby', (req, res) => {
+    const searchedField = req.query.Building;
+    EventModel.find({ Building: { $regex: searchedField, $options: '$i' } })
+        .then(data => {
+            res.send(data)
+        })
+})
 
 module.exports = router

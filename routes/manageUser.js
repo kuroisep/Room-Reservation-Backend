@@ -8,6 +8,7 @@ const StatusModel = require('../models/Status');
 const OrgModel = require('../models/Org');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const auth = require('../middleware/auth')
 
 var storage = multer.diskStorage({
     destination: (req, res, cb) => {
@@ -88,35 +89,31 @@ router.delete('/status/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const user = req.body.user
-    const pass = req.body.pass
-    const first_name = req.body.firstname
-    const last_name = req.body.lastname
-    const email = req.body.Email
-    const status = Status.name
-    const orgID = Organization.name
-    const role = req.body.Role
-    const image = req.body.image
 
-    Status = await StatusModel.findbyId(req.body.status)
-    Organization = await OrgModel.findbyId(req.body.org)
+    const Status = await StatusModel.findById(req.body.status);
+    const Organization = await OrgModel.findById(req.body.org);
+
+    const username = req.body.username
+    const password = req.body.password
+    const firstname = req.body.firstname
+    const lastname = req.body.lastname
+    const email = req.body.email
+    const status = Status.name
+    const org = Organization.name
+    const role = req.body.role
 
     const Users = new UsersModel({
-        _id: new mongoose.Types.ObjectId(),
-        user: user,
-        pass: pass,
-        firstname: first_name,
-        lastname: last_name,
-        Email: email,
+        username: username,
+        password: password,
+        firstname: firstname,
+        lastname: lastname,
+        email: email,
         status: status,
-        Role: role,
-        orgID: orgID,
-        image: {
-            data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)),
-            contentType: 'image/png'
-        }
+        role: role,
+        org: org
     });
 
+    Status.userID.push(Users._id.toString())
     Organization.userID.push(Users._id.toString())
 
     try {
@@ -193,21 +190,22 @@ router.get('/searchby', (req, res) => {
 })
 
 router.get('/userId', (req, res) => {
+
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split(' ')[1], decoded;
         console.log(authorization)
 
         try {
-            decoded = jwt.verify(authorization)
+            decoded = jwt.verify(authorization, process.env.TOKEN_SECRET)
         } catch (e) {
             return res.status(401).send('unauthorized');
         }
-
-        var userId = decoded._id;
-        UsersModel.findOne({ _id: userId }).then(function (user) {
-            return res.send(200);
-        });
     }
+
+    var userId = decoded._id;
+    UsersModel.findOne({ _id: userId }).then(function (user) {
+        res.send(user)
+    });
 })
 
 module.exports = router;
