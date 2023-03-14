@@ -8,18 +8,6 @@ const StatusModel = require('../models/Status');
 const OrgModel = require('../models/Org');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const auth = require('../middleware/auth')
-
-var storage = multer.diskStorage({
-    destination: (req, res, cb) => {
-        cb(null, 'uploads')
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.filename)
-    }
-});
-
-var upload = multer({ storage: storage });
 
 router.post('/status', async (req, res) => {
     const priority = req.body.priority
@@ -88,7 +76,18 @@ router.delete('/status/:id', async (req, res) => {
 
 })
 
-router.post('/', async (req, res) => {
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./uploads")
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const upload = multer({ storage: storage });
+
+router.post('/', upload.single('image'), async (req, res) => {
 
     const Status = await StatusModel.findById(req.body.status);
     const Organization = await OrgModel.findById(req.body.org);
@@ -101,6 +100,7 @@ router.post('/', async (req, res) => {
     const status = Status.name
     const org = Organization.name
     const role = req.body.role
+    const image = req.file.path
 
     const Users = new UsersModel({
         username: username,
@@ -110,7 +110,8 @@ router.post('/', async (req, res) => {
         email: email,
         status: status,
         role: role,
-        org: org
+        org: org,
+        image: image
     });
 
     Status.userID.push(Users._id.toString())
