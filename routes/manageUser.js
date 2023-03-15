@@ -8,6 +8,8 @@ const StatusModel = require('../models/Status');
 const OrgModel = require('../models/Org');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const bcrypt = require('bcryptjs');
+const cloudinary = require('cloudinary');
 
 router.post('/status', async (req, res) => {
     const priority = req.body.priority
@@ -92,37 +94,42 @@ router.post('/', upload.single('image'), async (req, res) => {
     const Status = await StatusModel.findById(req.body.status);
     const Organization = await OrgModel.findById(req.body.org);
 
-    const username = req.body.username
-    const password = req.body.password
-    const firstname = req.body.firstname
-    const lastname = req.body.lastname
-    const email = req.body.email
-    const status = Status.name
-    const org = Organization.name
-    const role = req.body.role
-    const image = req.file.path
+    const salt = await bcrypt.genSalt(10);
 
-    const Users = new UsersModel({
-        username: username,
-        password: password,
-        firstname: firstname,
-        lastname: lastname,
-        email: email,
-        status: status,
-        role: role,
-        org: org,
-        image: image
-    });
+    cloudinary.v2.uploader.upload(req.file.path, async (error, result) => {
 
-    Status.userID.push(Users._id.toString())
-    Organization.userID.push(Users._id.toString())
+        const username = req.body.username
+        const password = await bcrypt.hash(req.body.password, salt);
+        const firstname = req.body.firstname
+        const lastname = req.body.lastname
+        const email = req.body.email
+        const status = Status.name
+        const org = Organization.name
+        const role = req.body.role
+        const image = result.secure_url
 
-    try {
-        await Users.save();
-        res.send('Success');
-    } catch (err) {
-        res.status(400).send(err);
-    }
+        const Users = new UsersModel({
+            username: username,
+            password: password,
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            status: status,
+            role: role,
+            org: org,
+            image: image
+        });
+
+        Status.userID.push(Users._id.toString())
+        Organization.userID.push(Users._id.toString())
+
+        try {
+            Users.save();
+            res.send('Success');
+        } catch (err) {
+            res.status(400).send(err);
+        }
+    })
 });
 
 router.get('/', async (req, res) => {
@@ -130,11 +137,11 @@ router.get('/', async (req, res) => {
         if (err) {
             res.send(err)
         } else {
-            res.render('imagesPage', { result: result });
             res.send(result)
         }
     })
 })
+
 
 router.put("/", async (req, res) => {
     const newPass = req.body.newPass

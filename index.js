@@ -3,10 +3,19 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cloudinary = require('cloudinary')
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+
+require("dotenv").config();
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+});
 
 //Import Routes
 const manageUser = require('./routes/manageUser');
