@@ -12,6 +12,9 @@ const RequestSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    username: {
+        type: String,
+    },
     Object: {
         type: [],
         required: true,
@@ -26,7 +29,6 @@ const RequestSchema = new mongoose.Schema({
     },
     Status_Approve: {
         type: String,
-        default: "Unapproved"
     },
     Seat: {
         type: String,

@@ -122,6 +122,8 @@ router.post('/', upload.single('image'), async (req, res) => {
 
         Status.userID.push(Users._id.toString())
         Organization.userID.push(Users._id.toString())
+        await Organization.save()
+        await Status.save()
 
         try {
             Users.save();

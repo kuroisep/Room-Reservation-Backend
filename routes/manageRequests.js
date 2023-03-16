@@ -6,14 +6,21 @@ const EventModel = require('../models/Event');
 const UserModel = require('../models/Users');
 const auth = require('../middleware/auth');
 const RoomModel = require('../models/Rooms');
+const OrgModel = require('../models/Org');
+const mongoose = require('mongoose')
 
 router.post('/', async (req, res) => {
     const User = await UserModel.findById(req.body.UserID)
     const Rooms = await RoomModel.findById(req.body.Room)
 
+    // Org = mongoose.Types.ObjectId(User.org)
+
+    const Organization = await OrgModel.findOne({ name: User.org })
+
     const Room = Rooms.Name
     const Building = Rooms.Building
-    const UserID = User.user
+    const UserID = req.body.UserID
+    const username = User.username
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
     const Seat = req.body.Seat
@@ -24,6 +31,8 @@ router.post('/', async (req, res) => {
         Room: Room,
         Building: Building,
         UserID: UserID,
+        username: username,
+        username: username,
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
         Seat: Seat,
@@ -51,6 +60,9 @@ router.post('/', async (req, res) => {
         })
         //  console.log(Date_Reserve[i])
         await Event.save();
+
+        Organization.reqID.push(Event._id.toString())
+        await Organization.save()
     }
 })
 
