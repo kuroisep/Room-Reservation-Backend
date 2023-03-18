@@ -5,7 +5,9 @@ const RoomsModel = require('../models/Rooms');
 const BuildingModel = require('../models/Building');
 const RoomTypeModel = require('../models/RoomType');
 const OrgModel = require('../models/Org')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary');
+const multer = require('multer');
 
 function paginatedResults(model) {
     return async (req, res, next) => {
@@ -164,44 +166,57 @@ router.delete('/roomtype/:id', async (req, res) => {
 
 })
 
+const storage = multer.diskStorage({
+    destination: function (req, res, cb) {
+        cb(null, '/uploads/room')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
 
-router.post('/room', async (req, res) => {
+const upload = multer({ storage: storage });
+
+router.post('/room', upload.single('image'), async (req, res) => {
 
     Build = await BuildingModel.findById(req.body.Building)
     RoomT = await RoomTypeModel.findById(req.body.RoomType)
 
-    const Name = req.body.Name
-    const Detail = req.body.Detail
-    const Contributor = req.body.Contributor
-    const RoomType = RoomT.name
-    const Building = Build.name
-    const Seat = req.body.Seat
-    const Size = req.body.Size
-    const Equipment = req.body.Equipment
-    const useCount = req.body.useCount
-    const image = req.body.image
+    cloudinary.v2.uploader.upload(req.file.path, async (error, result) => {
 
-    const Rooms = new RoomsModel({
-        Name: Name,
-        Detail: Detail,
-        Contributor: Contributor,
-        RoomType: RoomType,
-        Building: Building,
-        Seat: Seat,
-        Size: Size,
-        Equipment: Equipment,
-        useCount: useCount,
-        image: image
-    });
+        const Name = req.body.Name
+        const Detail = req.body.Detail
+        const Contributor = req.body.Contributor
+        const RoomType = RoomT.name
+        const Building = Build.name
+        const Seat = req.body.Seat
+        const Size = req.body.Size
+        const Equipment = req.body.Equipment
+        const useCount = req.body.useCount
+        const image = result.secure_url
 
-    Build.roomID.push(Rooms._id.toString())
-    await Build.save()
+        const Rooms = new RoomsModel({
+            Name: Name,
+            Detail: Detail,
+            Contributor: Contributor,
+            RoomType: RoomType,
+            Building: Building,
+            Seat: Seat,
+            Size: Size,
+            Equipment: Equipment,
+            useCount: useCount,
+            image: image
+        });
 
-    RoomT.roomID.push(Rooms._id.toString())
-    await RoomT.save()
+        Build.roomID.push(Rooms._id.toString())
+        await Build.save()
 
-    await Rooms.save();
-    res.send('Success')
+        RoomT.roomID.push(Rooms._id.toString())
+        await RoomT.save()
+
+        await Rooms.save();
+        res.send('Success')
+    })
 });
 
 

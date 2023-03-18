@@ -1,7 +1,8 @@
 const { application } = require('express');
 const express = require('express');
 const router = express.Router();
-const OrgModel = require('../models/Org')
+const OrgModel = require('../models/Org');
+const BuildingModel = require('../models/Building');
 
 router.post('/', async (req, res) => {
     const name = req.body.name
@@ -91,6 +92,15 @@ router.get('/searchby', (req, res) => {
         .then(data => {
             res.send(data)
         })
+})
+
+router.get('/building/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.find({ _id: id })
+
+    BuildingModel.find({ 'id': { $in: [org.buildingID] } }).then(data => {
+        res.send(data)
+    })
 })
 
 module.exports = router
