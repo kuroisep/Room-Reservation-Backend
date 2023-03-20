@@ -19,9 +19,25 @@ const RequestSchema = new mongoose.Schema({
         type: [],
         required: true,
     },
-    Date_Reserve: {
+    startTime: {
         type: Array,
         default: [Date]
+    },
+    endTime: {
+        type: Array,
+        default: [Date]
+    },
+    repeatDate: {
+        type: Number
+    },
+    recurrance: {
+        type: Number
+    },
+    endDate: {
+        type: Date
+    },
+    allDay: {
+        type: Boolean
     },
     Purpose: {
         type: String,

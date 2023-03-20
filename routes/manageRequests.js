@@ -21,6 +21,12 @@ router.post('/', async (req, res) => {
     const Building = Rooms.Building
     const UserID = req.body.UserID
     const username = User.username
+    const startTime = req.body.startTime
+    const endTime = req.body.endTime
+    const repeatDate = req.body.repeatDate
+    const recurrance = req.body.recurrance
+    const endDate = req.body.endDate
+    const allDay = req.body.allDay
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
     const Seat = req.body.Seat
@@ -33,6 +39,12 @@ router.post('/', async (req, res) => {
         UserID: UserID,
         username: username,
         username: username,
+        startTime: startTime,
+        endTime: endTime,
+        repeatDate: repeatDate,
+        recurrance: recurrance,
+        endDate: endDate,
+        allDay: allDay,
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
         Seat: Seat,
@@ -47,12 +59,14 @@ router.post('/', async (req, res) => {
         res.status(400).send(err);
     }
 
-    for (let i = 0; i < Date_Reserve.length; i++) {
+    for (let i = 0; i < startTime.length; i++) {
         const Event = new EventModel({
             Room: Room,
             Building: Building,
             UserID: UserID,
-            Date_Reserve: Date_Reserve[i],
+            startTime: startTime[i],
+            endTime: endTime[i],
+            allDay: allDay,
             Status_Approve: Status_Approve,
             Seat: Seat,
             Object: Object,

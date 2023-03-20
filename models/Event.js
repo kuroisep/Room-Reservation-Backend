@@ -1,3 +1,4 @@
+const boolean = require('@hapi/joi/lib/types/boolean');
 const mongoose = require('mongoose')
 
 const EventSchema = new mongoose.Schema({
@@ -16,15 +17,20 @@ const EventSchema = new mongoose.Schema({
         type: [],
         required: true,
     },
-    Date_Reserve: {
-        type: Date,
+    startTime: {
+        type: Date
+    },
+    endTime: {
+        type: Date
+    },
+    allDay: {
+        type: boolean
     },
     Purpose: {
         type: String,
     },
     Status_Approve: {
-        type: String,
-        default: "Unapproved"
+        type: String
     },
     Seat: {
         type: String,
