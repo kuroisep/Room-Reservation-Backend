@@ -166,16 +166,22 @@ router.delete('/roomtype/:id', async (req, res) => {
 
 })
 
+const maxSize = 10 * 1000 * 1000;
 const storage = multer.diskStorage({
-    destination: function (req, res, cb) {
-        cb(null, '/uploads/room')
+    destination: function (req, file, cb) {
+        cb(null, "./uploads")
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer(
+    {
+        storage: storage,
+        limits: { fileSize: maxSize }
+    }
+);
 
 router.post('/room', upload.single('image'), async (req, res) => {
 
