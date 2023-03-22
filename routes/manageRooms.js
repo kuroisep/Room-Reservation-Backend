@@ -77,15 +77,15 @@ router.get('/building', async (req, res) => {
 })
 
 
-router.put("/building", async (req, res) => {
-    const newname = req.body.newname;
-    const id = req.body.id;
+router.put("/building/:id", async (req, res) => {
+    const newname = req.body.name;
+    const id = req.params.id;
+
+    const building = await BuildingModel.findById(id)
 
     try {
-        await BuildingModel.findById(id, (error, friendToUpdate) => {
-            res.name = newname;
-            BuildingModel.save();
-        });
+        building.name = newname;
+        building.save();
     } catch (err) {
         console.log(err);
     }
@@ -138,15 +138,16 @@ router.get('/roomtype', async (req, res) => {
 })
 
 
-router.put("/roomtype", async (req, res) => {
-    const newname = req.body.newname;
-    const id = req.body.id;
+router.put("/roomtype/:id", async (req, res) => {
+
+    const newname = req.body.name;
+    const id = req.params.id;
+
+    const roomtype = await RoomTypeModel.findById(id)
 
     try {
-        await RoomTypeModel.findById(id, (error, friendToUpdate) => {
-            res.name = newname;
-            RoomTypeModel.save();
-        });
+        roomtype.name = newname
+        roomtype.save()
     } catch (err) {
         console.log(err);
     }
@@ -185,21 +186,27 @@ const upload = multer(
 
 router.post('/room', upload.single('image'), async (req, res) => {
 
-    Build = await BuildingModel.findById(req.body.Building)
-    RoomT = await RoomTypeModel.findById(req.body.RoomType)
+    const Build = await BuildingModel.findById(req.body.Building);
+    const RoomT = await RoomTypeModel.findById(req.body.RoomType);
 
-    cloudinary.v2.uploader.upload(req.file.path, async (error, result) => {
+    cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, result) => {
 
         const Name = req.body.Name
         const Detail = req.body.Detail
         const Contributor = req.body.Contributor
         const RoomType = RoomT.name
         const Building = Build.name
+        const Org = Build.org
         const Seat = req.body.Seat
         const Size = req.body.Size
-        const Equipment = req.body.Equipment
+        const Object = req.body.Object
         const useCount = req.body.useCount
-        const image = result.secure_url
+        const image = {
+            public_id: result.public_id,
+            url: result.secure_url
+        }
+
+        const organization = await OrgModel.findOne({ name: Org })
 
         const Rooms = new RoomsModel({
             Name: Name,
@@ -207,12 +214,16 @@ router.post('/room', upload.single('image'), async (req, res) => {
             Contributor: Contributor,
             RoomType: RoomType,
             Building: Building,
+            Org: Org,
             Seat: Seat,
             Size: Size,
-            Equipment: Equipment,
+            Object: Object,
             useCount: useCount,
             image: image
         });
+
+        organization.roomID.push(Rooms._id.toString())
+        await organization.save()
 
         Build.roomID.push(Rooms._id.toString())
         await Build.save()
@@ -220,8 +231,12 @@ router.post('/room', upload.single('image'), async (req, res) => {
         RoomT.roomID.push(Rooms._id.toString())
         await RoomT.save()
 
-        await Rooms.save();
-        res.send('Success')
+        try {
+            Rooms.save();
+            res.send('Success')
+        } catch (err) {
+            res.send(err)
+        }
     })
 });
 
@@ -238,32 +253,53 @@ router.get('/room', paginatedResults(RoomsModel), async (req, res) => {
 })
 
 
-router.put("/room", async (req, res) => {
+router.put("/room/:id", upload.single('image'), async (req, res) => {
 
-    const id = req.body.id
-    const newName = req.body.newName
-    const newDetail = req.body.newDetail
-    const newContributor = req.body.newContributor
-    const newSeat = req.body.Seat
-    const newSize = req.body.Size
-    const newEquipment = req.body.Equipment
+    const room = await RoomsModel.findById(req.params.id);
+    const Build = await BuildingModel.findById(req.body.Building);
+    const RoomT = await RoomTypeModel.findById(req.body.RoomType);
 
-
-    try {
-        await RoomsModel.findById(id, (error, res) => {
-            req.Name = newName
-            req.Detail = newDetail
-            req.Contributor = newContributor
-            req.Seat = newSeat
-            req.Size = newSize
-            req.newEquipment = newEquipment
-            RoomsModel.save();
-        });
-    } catch (err) {
-        console.log(err);
+    if (req.body.image !== '') {
+        const imgid = room.image.public_id;
+        if (imgid) {
+            await cloudinary.v2.uploader.destroy(imgid);
+        }
     }
 
-    res.send("updated");
+    cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, newresult) => {
+
+        const newName = req.body.Name
+        const newDetail = req.body.Detail
+        const newContributor = req.body.Contributor
+        const newRoomType = RoomT.name
+        const newBuilding = Build.name
+        const newOrg = Build.org
+        const newSeat = req.body.Seat
+        const newSize = req.body.Size
+        const newObject = req.body.Object
+        const newimage = {
+            public_id: newresult.public_id,
+            url: newresult.secure_url
+        }
+
+        room.Name = newName
+        room.Detail = newDetail
+        room.Contributor = newContributor
+        room.RoomType = newRoomType
+        room.Building = newBuilding
+        room.Org = newOrg
+        room.Seat = newSeat
+        room.Size = newSize
+        room.Object = newObject
+        room.image = newimage
+
+        try {
+            room.save();
+            res.send("updated");
+        } catch (err) {
+            console.log(err);
+        }
+    })
 })
 
 router.delete('/room/:id', async (req, res) => {

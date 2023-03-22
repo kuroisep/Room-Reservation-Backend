@@ -43,19 +43,22 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.put("/", async (req, res) => {
-    const newname = req.body.newname;
-    const neworgType = req.body.neworgType
-    const newprofile = req.body.newprofile
-    const id = req.body.id;
+router.put("/:id", async (req, res) => {
+
+    const id = req.params.id
+
+    const newname = req.body.name;
+    const neworgType = req.body.orgType
+    const newprofile = req.body.profile
+
+    const org = await OrgModel.findById(id);
 
     try {
-        await OrgModel.findById(id, (error, friendToUpdate) => {
-            res.name = newname,
-                res.orgType = neworgType,
-                res.profile = newprofile,
-                RequestsModel.save();
-        });
+        org.name = newname,
+            org.orgType = neworgType,
+            org.profile = newprofile,
+            org.save();
+
     } catch (err) {
         console.log(err);
     }

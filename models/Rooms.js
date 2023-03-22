@@ -7,6 +7,9 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Detail: {
+        type: String
+    },
     Contributor: {
         type: String,
         required: true,
@@ -21,7 +24,9 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
+    Org: {
+        type: String
+    },
     Seat: {
         type: Number,
         required: true,
@@ -38,10 +43,16 @@ const RoomSchema = new mongoose.Schema({
 
     useCount: {
         type: Number,
+        default: 0
     },
 
     image: {
-        type: String
+        public_id: {
+            type: String
+        },
+        url: {
+            type: String
+        }
     }
 });
 
