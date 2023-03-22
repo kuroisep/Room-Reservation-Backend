@@ -259,47 +259,47 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
     const Build = await BuildingModel.findById(req.body.Building);
     const RoomT = await RoomTypeModel.findById(req.body.RoomType);
 
+    const newName = req.body.Name
+    const newDetail = req.body.Detail
+    const newContributor = req.body.Contributor
+    const newRoomType = RoomT.name
+    const newBuilding = Build.name
+    const newOrg = Build.org
+    const newSeat = req.body.Seat
+    const newSize = req.body.Size
+    const newObject = req.body.Object
+
     if (req.body.image !== '') {
         const imgid = room.image.public_id;
         if (imgid) {
             await cloudinary.v2.uploader.destroy(imgid);
         }
+
+        await cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, newresult) => {
+            room.image = {
+                public_id: newresult.public_id,
+                url: newresult.secure_url
+            }
+        })
     }
 
-    cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, newresult) => {
+    room.Name = newName
+    room.Detail = newDetail
+    room.Contributor = newContributor
+    room.RoomType = newRoomType
+    room.Building = newBuilding
+    room.Org = newOrg
+    room.Seat = newSeat
+    room.Size = newSize
+    room.Object = newObject
 
-        const newName = req.body.Name
-        const newDetail = req.body.Detail
-        const newContributor = req.body.Contributor
-        const newRoomType = RoomT.name
-        const newBuilding = Build.name
-        const newOrg = Build.org
-        const newSeat = req.body.Seat
-        const newSize = req.body.Size
-        const newObject = req.body.Object
-        const newimage = {
-            public_id: newresult.public_id,
-            url: newresult.secure_url
-        }
+    try {
+        room.save();
+        res.send("updated");
+    } catch (err) {
+        console.log(err);
+    }
 
-        room.Name = newName
-        room.Detail = newDetail
-        room.Contributor = newContributor
-        room.RoomType = newRoomType
-        room.Building = newBuilding
-        room.Org = newOrg
-        room.Seat = newSeat
-        room.Size = newSize
-        room.Object = newObject
-        room.image = newimage
-
-        try {
-            room.save();
-            res.send("updated");
-        } catch (err) {
-            console.log(err);
-        }
-    })
 })
 
 router.delete('/room/:id', async (req, res) => {
