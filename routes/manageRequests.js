@@ -154,4 +154,12 @@ router.get('/:id', (req, res) => {
     })
 })
 
+router.get('/:userid', (req, res) => {
+
+    fetchid = req.params.userid;
+    RequestsModel.find(({ UserID: fetchid }), function (err, val) {
+        res.send(val);
+    })
+})
+
 module.exports = router
