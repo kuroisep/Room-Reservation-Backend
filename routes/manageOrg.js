@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const OrgModel = require('../models/Org');
 const BuildingModel = require('../models/Building');
+const UserModel = require('../models/Users');
 
 router.post('/', async (req, res) => {
     const name = req.body.name
@@ -102,6 +103,15 @@ router.get('/building/:id', async (req, res) => {
     const org = await OrgModel.find({ _id: id })
 
     BuildingModel.find({ 'id': { $in: [org.buildingID] } }).then(data => {
+        res.send(data)
+    })
+})
+
+router.get('/user/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.find({ _id: id })
+
+    UserModel.find({ ':id': { $in: [org.userID] } }).then(data => {
         res.send(data)
     })
 })

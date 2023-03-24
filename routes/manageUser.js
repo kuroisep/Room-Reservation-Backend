@@ -126,10 +126,10 @@ router.post('/', upload.single('image'), async (req, res) => {
             image: image
         });
 
-        Status.userID.push(Users._id.toString())
-        Organization.userID.push(Users._id.toString())
-        await Organization.save()
+        Status.userID.push(Users._id.toString());
         await Status.save()
+        Organization.userID.push(Users._id.toString());
+        await Organization.save()
 
         try {
             Users.save();
@@ -205,7 +205,7 @@ router.get('/searchby', (req, res) => {
         })
 })
 
-router.get('/userId', (req, res) => {
+router.get('/userprofile', (req, res) => {
 
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split(' ')[1], decoded;
