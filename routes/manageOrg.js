@@ -1,5 +1,6 @@
 const { application } = require('express');
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const OrgModel = require('../models/Org');
 const BuildingModel = require('../models/Building');
@@ -100,18 +101,20 @@ router.get('/searchby', (req, res) => {
 
 router.get('/building/:id', async (req, res) => {
     const id = req.params.id
-    const org = await OrgModel.find({ _id: id })
+    const org = await OrgModel.findOne({ _id: id })
 
-    BuildingModel.find({ 'id': { $in: [org.buildingID] } }).then(data => {
+    const buildings = org.buildingID
+    BuildingModel.find({ _id: { $in: buildings.map((buildings) => new mongoose.Types.ObjectId(buildings)) } }).then(data => {
         res.send(data)
     })
 })
 
 router.get('/user/:id', async (req, res) => {
     const id = req.params.id
-    const org = await OrgModel.find({ _id: id })
+    const org = await OrgModel.findOne({ _id: id })
 
-    UserModel.find({ ':id': { $in: [org.userID] } }).then(data => {
+    const users = org.userID
+    UserModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) } }).then(data => {
         res.send(data)
     })
 })
