@@ -61,8 +61,13 @@ router.post('/register', upload.single('image'), async (req, res) => {
             image: image
         });
 
-        Status.userID.push(Users._id.toString())
-        Organization.userID.push(Users._id.toString())
+        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
+        Users.token = token
+
+        Status.userID.push(Users._id.toString());
+        await Status.save()
+        Organization.userID.push(Users._id.toString());
+        await Organization.save()
 
         try {
             Users.save();
@@ -86,7 +91,9 @@ router.post('/login', async (req, res) => {
     if (!validPass) return res.status(400).send('Invalid Password');
     else {
         const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-        res.header('auth-token', token).send(token);
+        user.token = token
+
+        res.status(200).send(user)
     }
     //Create and assign a token
 });

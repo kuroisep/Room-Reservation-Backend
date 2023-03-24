@@ -30,6 +30,9 @@ const UserSchema = new mongoose.Schema({
     },
     image: {
         type: String
+    },
+    token: {
+        type: String
     }
 });
 
