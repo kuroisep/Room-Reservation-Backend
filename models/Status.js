@@ -12,7 +12,7 @@ const StatusSchema = new mongoose.Schema({
     userID: {
         type: []
     },
-    orgID: {
+    org: {
         type: String
     }
 })

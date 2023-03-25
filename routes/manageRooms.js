@@ -107,11 +107,14 @@ router.delete('/building/:id', async (req, res) => {
 
 router.post('/roomtype', async (req, res) => {
 
-    Build = await BuildingModel.findById(req.body.building)
-
     const name = req.body.name
     const building = req.body.building
     const roomID = req.body.roomID
+
+    const build = await BuildingModel.findById(req.body.building)
+
+    const org = build.org
+    const organization = await OrgModel.findOne({ name: org })
 
     const RoomTypes = new RoomTypeModel({
         name: name,
@@ -119,8 +122,11 @@ router.post('/roomtype', async (req, res) => {
         roomID: roomID
     });
 
-    Build.roomType.push(RoomTypes._id.toString())
-    await Build.save()
+    build.roomType.push(RoomTypes._id.toString())
+    await build.save()
+
+    organization.roomTypeID.push(RoomTypes._id.toString())
+    await organization.save()
 
     await RoomTypes.save();
     res.send('Success')

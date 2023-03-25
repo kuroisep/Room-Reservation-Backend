@@ -47,7 +47,10 @@ router.post('/register', upload.single('image'), async (req, res) => {
         const status = Status.name
         const org = Organization.name
         const role = req.body.role
-        const image = result.secure_url
+        const image = {
+            public_id: result.public_id,
+            url: result.secure_url
+        }
 
         const Users = new User({
             username: username,

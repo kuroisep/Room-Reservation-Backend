@@ -29,7 +29,12 @@ const UserSchema = new mongoose.Schema({
         type: String
     },
     image: {
-        type: String
+        public_id: {
+            type: String
+        },
+        url: {
+            type: String
+        }
     },
     token: {
         type: String

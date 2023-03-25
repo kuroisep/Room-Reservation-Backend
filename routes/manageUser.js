@@ -12,11 +12,13 @@ const bcrypt = require('bcryptjs');
 const cloudinary = require('cloudinary');
 
 router.post('/status', async (req, res) => {
+
+    const Organization = await OrgModel.findById(req.body.org)
+
     const priority = req.body.priority
     const name = req.body.name
     const userID = req.body.userID
-    const orgID = Organization.name
-    const Organization = await OrgModel.findById(req.body.orgID)
+    const org = Organization.name
 
     const Status = new StatusModel({
         name: name,
@@ -47,18 +49,22 @@ router.get('/status', async (req, res) => {
     })
 })
 
-router.put("/status", async (req, res) => {
+router.put("/status/:id", async (req, res) => {
+
+    const Organization = await OrgModel.findById(req.body.org)
+
     const newname = req.body.newname
     const newpriority = req.body.newpriority
+    const neworg = Organization.name
 
-    const id = req.body.id;
-    console.log(id);
+    const id = req.params.id
+
+    const status = await StatusModel.findById(id)
     try {
-        await StatusModel.findById(id, (error, res) => {
-            res.name = newname;
-            res.priority = newpriority;
-            res.save();
-        });
+        status.name = newname
+        status.priority = newpriority
+        status.org = neworg
+        status.save()
     } catch (err) {
         console.log(err);
     }
@@ -112,7 +118,10 @@ router.post('/', upload.single('image'), async (req, res) => {
         const status = Status.name
         const org = Organization.name
         const role = req.body.role
-        const image = result.secure_url
+        const image = {
+            public_id: result.public_id,
+            url: result.secure_url
+        }
 
         const Users = new UsersModel({
             username: username,
@@ -151,24 +160,50 @@ router.get('/', async (req, res) => {
 })
 
 
-router.put("/", async (req, res) => {
-    const newPass = req.body.newPass
-    const newFirstName = req.body.newFirstName
-    const newLastName = req.body.newLastName
-    const id = req.body.id;
-    console.log(id);
-    try {
-        await UsersModel.findById(id, (error, res) => {
-            res.pass = newPass;
-            res.firstname = newFirstName;
-            res.lastname = newLastName;
-            res.save();
-        });
-    } catch (err) {
-        console.log(err);
+router.put("/:id", async (req, res) => {
+
+    const user = await UsersModel.findById(req.params.id)
+    const Status = await StatusModel.findById(req.body.status);
+    const Organization = await OrgModel.findById(req.body.org);
+
+    const newusername = req.body.username
+    const newpassword = await bcrypt.hash(req.body.password, salt);
+    const newfirstname = req.body.firstname
+    const newlastname = req.body.lastname
+    const newemail = req.body.email
+    const newstatus = Status.name
+    const neworg = Organization.name
+    const newrole = req.body.role
+
+    if (req.body.image !== '') {
+        const imgid = user.image.public_id;
+        if (imgid) {
+            await cloudinary.v2.uploader.destroy(imgid);
+        }
+
+        await cloudinary.v2.uploader.upload(req.file.path, { folder: "users" }, async (error, newresult) => {
+            user.image = {
+                public_id: newresult.public_id,
+                url: newresult.secure_url
+            }
+        })
     }
 
-    res.send("updated");
+    user.username = newusername
+    user.password = newpassword
+    user.firstname = newfirstname
+    user.lastname = newlastname
+    user.email = newemail
+    user.status = newstatus
+    user.role = newrole
+    user.org = neworg
+
+    try {
+        user.save()
+        res.send("updated")
+    } catch (err) {
+        console.log(err)
+    }
 })
 
 router.delete('/:id', async (req, res) => {
