@@ -374,4 +374,14 @@ router.get('/room/:id', (req, res) => {
     })
 })
 
+router.get('/buildingroom/:id', async (req, res) => {
+    const id = req.params.id
+    const building = await BuildingModel.findOne({ _id: id })
+
+    const rooms = building.roomID
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
+        res.send(data)
+    })
+})
+
 module.exports = router;
