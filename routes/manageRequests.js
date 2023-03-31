@@ -53,31 +53,33 @@ router.post('/', async (req, res) => {
     });
 
     try {
+        Rooms.useCount = (Rooms.useCount) + 1
+        Rooms.save()
         await Requests.save()
         res.send('Success')
     } catch (err) {
         res.status(400).send(err);
     }
-
-    for (let i = 0; i < startTime.length; i++) {
-        const Event = new EventModel({
-            Room: Room,
-            Building: Building,
-            UserID: UserID,
-            startTime: startTime[i],
-            endTime: endTime[i],
-            allDay: allDay,
-            Status_Approve: Status_Approve,
-            Seat: Seat,
-            Object: Object,
-            Purpose: Purpose
-        })
-        //  console.log(Date_Reserve[i])
-        await Event.save();
-
-        Organization.reqID.push(Event._id.toString())
-        await Organization.save()
-    }
+    /*
+        for (let i = 0; i < startTime.length; i++) {
+            const Event = new EventModel({
+                Room: Room,
+                Building: Building,
+                UserID: UserID,
+                startTime: startTime[i],
+                endTime: endTime[i],
+                allDay: allDay,
+                Status_Approve: Status_Approve,
+                Seat: Seat,
+                Object: Object,
+                Purpose: Purpose
+            })
+            //  console.log(Date_Reserve[i])
+            await Event.save();
+    
+            Organization.reqID.push(Event._id.toString())
+            await Organization.save()
+        }*/
 })
 
 router.get('/', async (req, res) => {

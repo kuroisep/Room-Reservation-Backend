@@ -24,7 +24,7 @@ router.post('/status', async (req, res) => {
         name: name,
         priority: priority,
         userID: userID,
-        orgID: orgID
+        org: org
     });
 
     Organization.statusID.push(Status._id.toString())
@@ -53,18 +53,18 @@ router.put("/status/:id", async (req, res) => {
 
     const Organization = await OrgModel.findById(req.body.org)
 
-    const newname = req.body.newname
-    const newpriority = req.body.newpriority
-    const neworg = Organization.name
+    const newname = req.body.name
+    const newpriority = req.body.priority
+    //   const neworg = Organization.name
 
     const id = req.params.id
 
     const status = await StatusModel.findById(id)
+
     try {
         status.name = newname
         status.priority = newpriority
-        status.org = neworg
-        status.save()
+        await status.save()
     } catch (err) {
         console.log(err);
     }
@@ -160,14 +160,17 @@ router.get('/', async (req, res) => {
 })
 
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single('image'), async (req, res) => {
 
     const user = await UsersModel.findById(req.params.id)
     const Status = await StatusModel.findById(req.body.status);
     const Organization = await OrgModel.findById(req.body.org);
 
+    const salt = await bcrypt.genSalt(10);
+
+
     const newusername = req.body.username
-    const newpassword = await bcrypt.hash(req.body.password, salt);
+    //const newpassword = await bcrypt.hash(req.body.password, 10);
     const newfirstname = req.body.firstname
     const newlastname = req.body.lastname
     const newemail = req.body.email
@@ -190,7 +193,7 @@ router.put("/:id", async (req, res) => {
     }
 
     user.username = newusername
-    user.password = newpassword
+    // user.password = newpassword
     user.firstname = newfirstname
     user.lastname = newlastname
     user.email = newemail

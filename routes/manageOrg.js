@@ -8,23 +8,21 @@ const UserModel = require('../models/Users');
 
 router.post('/', async (req, res) => {
     const name = req.body.name
-    const orgType = req.body.orgType
-    const profile = req.body.profile
     const roomID = req.body.roomID
     const roomTypeID = req.body.roomTypeID
     const buildingID = req.body.buildingID
     const userID = req.body.userID
     const statusID = req.body.statusID
+    const reqID = req.body.reqID
 
     const Org = new OrgModel({
         name: name,
-        orgType: orgType,
-        profile: profile,
         roomID: roomID,
         roomTypeID: roomTypeID,
         buildingID: buildingID,
         userID: userID,
-        statusID: statusID
+        statusID: statusID,
+        reqID: reqID
     });
 
     try {
@@ -50,8 +48,6 @@ router.put("/:id", async (req, res) => {
     const id = req.params.id
 
     const newname = req.body.name;
-    const neworgType = req.body.orgType
-    const newprofile = req.body.profile
 
     const org = await OrgModel.findById(id);
 

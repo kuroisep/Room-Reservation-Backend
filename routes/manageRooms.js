@@ -229,13 +229,13 @@ router.post('/room', upload.single('image'), async (req, res) => {
         });
 
         organization.roomID.push(Rooms._id.toString())
-        await organization.save()
+        organization.save()
 
         Build.roomID.push(Rooms._id.toString())
-        await Build.save()
+        Build.save()
 
         RoomT.roomID.push(Rooms._id.toString())
-        await RoomT.save()
+        RoomT.save()
 
         try {
             Rooms.save();

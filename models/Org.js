@@ -5,12 +5,6 @@ const OrgSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    orgType: {
-        type: String
-    },
-    profile: {
-        type: String
-    },
     roomID: {
         type: []
     },

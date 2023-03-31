@@ -45,6 +45,7 @@ const RequestSchema = new mongoose.Schema({
     },
     Status_Approve: {
         type: String,
+        default: "Pending"
     },
     Seat: {
         type: String,
