@@ -334,11 +334,6 @@ router.get('/search/:key', async (req, res) => {
 })
 
 router.get('/searchby', (req, res) => {
-    const searchedField = req.query.Name;
-    RoomsModel.find({ Name: { $regex: searchedField, $options: '$i' } })
-        .then(data => {
-            res.send(data)
-        })
 
     const searchField1 = req.query.Contributor;
     RoomsModel.find({ Contributor: { $regex: searchField1, $options: '$i' } })
