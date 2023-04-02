@@ -28,7 +28,7 @@ const RequestSchema = new mongoose.Schema({
         default: [Date]
     },
     repeatDate: {
-        type: Number
+        type: String
     },
     recurrance: {
         type: Number
