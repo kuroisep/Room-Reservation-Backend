@@ -139,25 +139,22 @@ router.get('/search/:key', async (req, res) => {
     res.send(result);
 })
 
-router.get('/searchby/', (req, res) => {
-    const searchedField = req.query.UserID;
-    /*RequestsModel.find(
-        { UserID: { $regex: searchedField, $options: '$i' } })
-        .then(data => {
-            res.send(data)
-        })*/
+router.get('/searchby/', async (req, res) => {
+    try {
+        let match = {};
+        if (req.query.Status_Approve) {
+            match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
+        }
+        if (req.query.UserID) {
+            match.UserID = new RegExp(req.query.UserID, "i");
+        }
 
-    const searchedField1 = req.query.Status_Approve;
-    RequestsModel.find(
-        {
-            $or: [
-                { Status_Approve: { $regex: searchedField1, $options: '$i' } },
-                //{ UserID: { $regex: searchedField, $options: '$i' } }
-            ]
-        })
-        .then(data => {
-            res.send(data)
-        })
+        const result = await RequestsModel.aggregate([{ $match: match }]);
+
+        res.send(result)
+    } catch (err) {
+        res.status(500).send(err);
+    }
 })
 
 router.get('/:id', (req, res) => {
