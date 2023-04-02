@@ -157,6 +157,32 @@ router.get('/searchby/', async (req, res) => {
     }
 })
 
+router.get('/history', async (req, res) => {
+    if (req.headers && req.headers.authorization) {
+        var authorization = req.headers.authorization.split(' ')[1], decoded;
+        console.log(authorization)
+
+        try {
+            decoded = jwt.verify(authorization, process.env.TOKEN_SECRET)
+        } catch (e) {
+            return res.status(401).send('unauthorized');
+        }
+    }
+
+    const userid = decoded._id;
+    let match = {};
+    if (req.query.Status_Approve) {
+        match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
+    }
+    if (userid) {
+        match.UserID = new RegExp(userid, "i");
+    }
+
+    const result = await RequestsModel.aggregate([{ $match: match }]);
+
+    res.send(result)
+})
+
 router.get('/:id', (req, res) => {
 
     fetchid = req.params.id;
