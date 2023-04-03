@@ -81,7 +81,22 @@ router.delete('/status/:id', async (req, res) => {
     catch (err) {
         console.log(err);
     }
+})
 
+router.get('/status/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    StatusModel.find(({ _id: fetchid }), function (err, val) {
+        res.send(val);
+    })
+})
+
+router.get('/user/:id', (req, res) => {
+
+    fetchid = req.params.id;
+    UsersModel.find(({ _id: fetchid }), function (err, val) {
+        res.send(val);
+    })
 })
 
 const maxSize = 10 * 1000 * 1000;
