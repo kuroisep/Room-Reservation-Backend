@@ -115,4 +115,14 @@ router.get('/user/:id', async (req, res) => {
     })
 })
 
+router.get('/status/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.findOne({ _id: id })
+
+    const status = org.userID
+    StatusModel.find({ _id: { $in: status.map((status) => new mongoose.Types.ObjectId(status)) } }).then(data => {
+        res.send(data)
+    })
+})
+
 module.exports = router
