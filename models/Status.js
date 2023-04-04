@@ -7,7 +7,6 @@ const StatusSchema = new mongoose.Schema({
     },
     priority: {
         type: String,
-        require: true
     },
     userID: {
         type: []
