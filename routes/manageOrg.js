@@ -5,6 +5,7 @@ const router = express.Router();
 const OrgModel = require('../models/Org');
 const BuildingModel = require('../models/Building');
 const UserModel = require('../models/Users');
+const StatusModel = require('../models/Status');
 
 router.post('/', async (req, res) => {
     const name = req.body.name
@@ -119,7 +120,7 @@ router.get('/status/:id', async (req, res) => {
     const id = req.params.id
     const org = await OrgModel.findOne({ _id: id })
 
-    const status = org.userID
+    const status = org.statusID;
     StatusModel.find({ _id: { $in: status.map((status) => new mongoose.Types.ObjectId(status)) } }).then(data => {
         res.send(data)
     })
