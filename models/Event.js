@@ -13,6 +13,9 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    username: {
+        type: String,
+    },
     Object: {
         type: [],
         required: true,

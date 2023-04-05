@@ -93,26 +93,92 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.put("/", async (req, res) => {
-    const newEquipment = req.body.newEquipment;
-    const newDate_Reserve = req.body.newDate_Reserve
-    const newStatus_Approve = req.body.newStatus_Approve
-    const newSeat = req.body.newSeat
-    const id = req.body.id;
+router.put("/:id", async (req, res) => {
+    const id = req.params.id;
 
-    try {
-        await RequestsModel.findById(id, (error, friendToUpdate) => {
-            res.Equipment = newEquipment;
-            res.Date_Reserve = newDate_Reserve;
-            res.Status_Approve = newStatus_Approve;
-            res.Seat = newSeat
-            RequestsModel.save();
-        });
-    } catch (err) {
-        console.log(err);
+    const request = await RequestsModel.findById(id);
+
+    if (req.body.Room) {
+        const Rooms = await RoomModel.findById(req.body.Room)
+        const newRoom = Rooms.Name;
+        const newBuilding = Rooms.Building
+
+        request.Room = newRoom;
+        request.Building = newBuilding
     }
+    if (req.body.UserID) {
+        const User = await UserModel.findById(req.body.UserID)
+        const newUserID = req.body.UserID
+        const newusername = User.username
 
-    res.send("updated");
+        request.UserID = newUserID
+        request.username = newusername
+    }
+    if (req.body.Object) {
+        const newObject = req.body.
+            request.Object = newObject
+    }
+    if (req.body.Purpose) {
+        const newPurpose = req.body.Purpose
+        request.Purpose = newPurpose
+    }
+    if (req.body.startTime) {
+        const newstartTime = req.body.startTime
+        request.startTime = newstartTime
+    }
+    if (req.body.endTime) {
+        request.endTime = req.body.endTime
+    }
+    if (req.body.repeatDate) {
+        request.repeatDate = req.body.repeatDate
+    }
+    if (req.body.recurrance) {
+        request.recurrance = req.body.recurrance
+    }
+    if (req.body.allDay) {
+        request.allDay = req.body.allDay
+    }
+    if (req.body.Status_Approve) {
+        request.Status_Approve = req.body.Status_Approve
+
+        if (request.Status_Approve == 'Approved') {
+            console.log(request.startTime.length)
+            for (let i = 0; i < request.startTime.length; i++) {
+                const Event = new EventModel({
+                    Room: request.Room,
+                    Building: request.Building,
+                    UserID: request.UserID,
+                    username: request.username,
+                    startTime: request.startTime[i][0],
+                    endTime: request.endTime[i][0],
+                    allDay: request.allDay,
+                    Status_Approve: request.Status_Approve,
+                    Seat: request.Seat,
+                    Object: request.Object,
+                    Purpose: request.Purpose
+                })
+                await Event.save();
+
+                const user = await UserModel.findById(request.UserID)
+
+                const Organization = await OrgModel.findOne(({ name: user.org }))
+
+                Organization.reqID.push(Event._id.toString())
+                await Organization.save()
+            }
+        }
+        if (req.body.Seat) {
+            request.Seat = req.body.Seat
+        }
+
+        try {
+            request.save()
+            res.send('updated');
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
 })
 
 router.delete('/:id', async (req, res) => {
