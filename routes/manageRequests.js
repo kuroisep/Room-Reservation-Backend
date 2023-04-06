@@ -214,6 +214,12 @@ router.get('/searchby/', async (req, res) => {
         if (req.query.UserID) {
             match.UserID = new RegExp(req.query.UserID, "i");
         }
+        if (req.query.Room) {
+            match.Room = new RegExp(req.query.Room, "i");
+        }
+        if (req.query.Building) {
+            match.Building = new RegExp(req.query.Building, "i");
+        }
 
         const result = await RequestsModel.aggregate([{ $match: match }]);
 

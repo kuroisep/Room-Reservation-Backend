@@ -6,6 +6,7 @@ const OrgModel = require('../models/Org');
 const BuildingModel = require('../models/Building');
 const UserModel = require('../models/Users');
 const StatusModel = require('../models/Status');
+const EventModel = require('../models/Event')
 
 router.post('/', async (req, res) => {
     const name = req.body.name
@@ -122,6 +123,16 @@ router.get('/status/:id', async (req, res) => {
 
     const status = org.statusID;
     StatusModel.find({ _id: { $in: status.map((status) => new mongoose.Types.ObjectId(status)) } }).then(data => {
+        res.send(data)
+    })
+})
+
+router.get('/request/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.findOne({ _id: id })
+
+    const req = org.reqID
+    EventModel.find({ _id: { $in: req.map((req) => new mongoose.Types.ObjectId(req)) } }).then(data => {
         res.send(data)
     })
 })

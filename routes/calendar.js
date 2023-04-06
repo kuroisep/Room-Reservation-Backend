@@ -35,12 +35,28 @@ router.get('/', async (req, res) => {
     });
 })
 
-router.get('/searchby', (req, res) => {
-    const searchedField = req.query.Building;
-    EventModel.find({ Building: { $regex: searchedField, $options: '$i' } })
-        .then(data => {
-            res.send(data)
-        })
+router.get('/searchby/', async (req, res) => {
+    try {
+        let match = {};
+        if (req.query.Status_Approve) {
+            match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
+        }
+        if (req.query.UserID) {
+            match.UserID = new RegExp(req.query.UserID, "i");
+        }
+        if (req.query.Room) {
+            match.Room = new RegExp(req.query.Room, "i");
+        }
+        if (req.query.Building) {
+            match.Building = new RegExp(req.query.Building, "i");
+        }
+
+        const result = await EventModel.aggregate([{ $match: match }]);
+
+        res.send(result)
+    } catch (err) {
+        res.status(500).send(err);
+    }
 })
 
 module.exports = router
