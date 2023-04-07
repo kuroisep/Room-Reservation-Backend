@@ -11,6 +11,8 @@ const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const cloudinary = require('cloudinary');
 
+require("dotenv").config();
+
 router.post('/status', async (req, res) => {
 
     const Organization = await OrgModel.findById(req.body.org)
@@ -133,8 +135,14 @@ router.post('/', upload.single('image'), async (req, res) => {
         const firstname = req.body.firstname
         const lastname = req.body.lastname
         const email = req.body.email
-        const status = Status.name
-        const org = Organization.name
+        const status = {
+            id: req.body.status,
+            name: Status.name
+        }
+        const org = {
+            id: req.body.org,
+            name: Organization.name
+        }
         const role = req.body.role
         const image = {
             public_id: result.public_id,
@@ -150,8 +158,11 @@ router.post('/', upload.single('image'), async (req, res) => {
             status: status,
             role: role,
             org: org,
-            image: image
+            image: image,
         });
+
+        const token = jwt.sign({ _id: Users._id }, process.env.TOKEN_SECRET)
+        Users.token = token
 
         Status.userID.push(Users._id.toString());
         await Status.save()

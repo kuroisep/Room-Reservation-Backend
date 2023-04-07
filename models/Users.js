@@ -20,13 +20,23 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
     status: {
-        type: String
+        id: {
+            type: String
+        },
+        name: {
+            type: String
+        }
     },
     role: {
         type: String
     },
     org: {
-        type: String
+        id: {
+            type: String
+        },
+        name: {
+            type: String
+        }
     },
     image: {
         public_id: {
