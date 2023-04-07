@@ -15,15 +15,12 @@ router.post('/', async (req, res) => {
     const Rooms = await RoomModel.findById(req.body.Room)
 
     const Organization = await OrgModel.findById(userid.org.id)
-
-<<<<<<< Updated upstream
     // const Organization = await OrgModel.findOne({ name: User.org })
 
-    const Room = Rooms.Name
-    const Building = Rooms.Building
-    const UserID = req.body.UserID
-    const username = User.username
-=======
+    const User = {
+        id: req.body.UserID,
+        name: userid.username
+    }
     const Room = {
         id: req.body.Room,
         name: Rooms.Name
@@ -32,11 +29,7 @@ router.post('/', async (req, res) => {
         id: Rooms.Building.id,
         name: Rooms.Building.name
     }
-    const username = {
-        id: req.body.User,
-        username: userid.username
-    }
->>>>>>> Stashed changes
+
     const startTime = req.body.startTime
     const endTime = req.body.endTime
     const repeatDate = req.body.repeatDate
@@ -52,7 +45,7 @@ router.post('/', async (req, res) => {
     const Requests = new RequestsModel({
         Room: Room,
         Building: Building,
-        User: username,
+        User: User,
         startTime: startTime,
         endTime: endTime,
         repeatDate: repeatDate,
@@ -77,29 +70,6 @@ router.post('/', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
-<<<<<<< Updated upstream
-    /*
-        for (let i = 0; i < startTime.length; i++) {
-            const Event = new EventModel({
-                Room: Room,
-                Building: Building,
-                UserID: UserID,
-                startTime: startTime[i],
-                endTime: endTime[i],
-                allDay: allDay,
-                Status_Approve: Status_Approve,
-                Seat: Seat,
-                Object: Object,
-                Purpose: Purpose
-            })
-            //  console.log(Date_Reserve[i])
-            await Event.save();
-
-            Organization.reqID.push(Event._id.toString())
-            await Organization.save()
-        }*/
-=======
->>>>>>> Stashed changes
 })
 
 router.get('/', async (req, res) => {
@@ -193,11 +163,11 @@ router.put("/:id", async (req, res) => {
                 if (typeof User.org === 'object' && typeof User.org.id === 'string') {
                     Organization = await OrgModel.findById(User.org.id);
                 } else
-                if (typeof User.org === 'string') {
-                    Organization = await OrgModel.findOne({ name: User.org });
-                } else {
-                    return res.status(500).send('invalid org format');
-                }
+                    if (typeof User.org === 'string') {
+                        Organization = await OrgModel.findOne({ name: User.org });
+                    } else {
+                        return res.status(500).send('invalid org format');
+                    }
 
                 Organization.reqID.push(Event._id.toString())
 =======
