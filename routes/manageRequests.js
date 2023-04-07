@@ -97,7 +97,7 @@ router.put("/:id", async (req, res) => {
         }
         const newBuilding = {
             id: req.body.Building,
-            name: Rooms.Building
+            name: Build.name
         }
 
         request.Room = newRoom;
@@ -156,7 +156,6 @@ router.put("/:id", async (req, res) => {
                 })
                 await Event.save();
 
-<<<<<<< Updated upstream
                 const User = await UserModel.findById(request.UserID)
 
                 let Organization;
@@ -169,13 +168,10 @@ router.put("/:id", async (req, res) => {
                         return res.status(500).send('invalid org format');
                     }
 
-                Organization.reqID.push(Event._id.toString())
-=======
-                const build = await BuildingModel.findById(request.Building.id)
-                const Organization = await OrgModel.findById(build.org.id)
+                //   const build = await BuildingModel.findById(request.Building.id)
+                //   const Organization = await OrgModel.findById(build.org.id)
 
                 Organization.eventID.push(Event._id.toString())
->>>>>>> Stashed changes
                 await Organization.save()
             }
         }
