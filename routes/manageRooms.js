@@ -374,7 +374,7 @@ router.get('/buildingroom/:id', async (req, res) => {
     const building = await BuildingModel.findOne({ _id: id })
 
     const rooms = building.roomID
-    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
         res.send(data)
     })
 })
