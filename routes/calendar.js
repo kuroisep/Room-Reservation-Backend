@@ -25,10 +25,16 @@ router.get('/', async (req, res) => {
 
     var userId = decoded._id;
     const User = await UserModel.findOne({ _id: userId })
-    const Organization = User.org
 
-    const org = await OrgModel.findOne({ name: Organization })
-
+    let org;
+    if (typeof User.org === 'object' && typeof User.org.id === 'string') {
+        org = await OrgModel.findById(User.org.id);
+    } else
+    if (typeof User.org === 'string') {
+        org = await OrgModel.findOne({ name: User.org });
+    } else {
+        return res.status(500).send('invalid org format');
+    }
 
     EventModel.find({ 'id': { $in: [org.reqID] }, Status_Approve: "Approved" }).then(data => {
         res.send(data)

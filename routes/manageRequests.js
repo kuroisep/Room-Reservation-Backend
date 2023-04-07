@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 
     // Org = mongoose.Types.ObjectId(User.org)
 
-    const Organization = await OrgModel.findOne({ name: User.org })
+    // const Organization = await OrgModel.findOne({ name: User.org })
 
     const Room = Rooms.Name
     const Building = Rooms.Building
@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
             })
             //  console.log(Date_Reserve[i])
             await Event.save();
-    
+
             Organization.reqID.push(Event._id.toString())
             await Organization.save()
         }*/
@@ -159,9 +159,17 @@ router.put("/:id", async (req, res) => {
                 })
                 await Event.save();
 
-                const user = await UserModel.findById(request.UserID)
+                const User = await UserModel.findById(request.UserID)
 
-                const Organization = await OrgModel.findOne(({ name: user.org }))
+                let Organization;
+                if (typeof User.org === 'object' && typeof User.org.id === 'string') {
+                    Organization = await OrgModel.findById(User.org.id);
+                } else
+                if (typeof User.org === 'string') {
+                    Organization = await OrgModel.findOne({ name: User.org });
+                } else {
+                    return res.status(500).send('invalid org format');
+                }
 
                 Organization.reqID.push(Event._id.toString())
                 await Organization.save()
