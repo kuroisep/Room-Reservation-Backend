@@ -131,8 +131,8 @@ router.get('/request/:id', async (req, res) => {
     const id = req.params.id
     const org = await OrgModel.findOne({ _id: id })
 
-    const req = org.reqID
-    EventModel.find({ _id: { $in: req.map((req) => new mongoose.Types.ObjectId(req)) } }).then(data => {
+    const request = org.reqID
+    EventModel.find({ _id: { $in: request.map((request) => new mongoose.Types.ObjectId(request)) } }).then(data => {
         res.send(data)
     })
 })
