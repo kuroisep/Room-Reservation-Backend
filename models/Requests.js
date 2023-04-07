@@ -8,12 +8,9 @@ const RequestSchema = new mongoose.Schema({
     Building: {
         type: String
     },
-    UserID: {
-        type: String,
-        required: true,
-    },
-    username: {
-        type: String,
+    User: {
+        id: { type: String },
+        name: { type: String }
     },
     Object: {
         type: [],

@@ -6,11 +6,14 @@ const RoomTypeSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-
-    building: {
-        type: String
+    org: {
+        id: {
+            type: String
+        },
+        name: {
+            type: String
+        }
     },
-
     roomID: {
         type: []
     }

@@ -17,10 +17,12 @@ router.post('/status', async (req, res) => {
 
     const Organization = await OrgModel.findById(req.body.org)
 
-    const priority = req.body.priority
     const name = req.body.name
     const userID = req.body.userID
-    const org = Organization.name
+    const org = {
+        id: req.body.org,
+        name: Organization.name
+    }
 
     const Status = new StatusModel({
         name: name,
@@ -65,7 +67,6 @@ router.put("/status/:id", async (req, res) => {
 
     try {
         status.name = newname
-        status.priority = newpriority
         await status.save()
     } catch (err) {
         console.log(err);

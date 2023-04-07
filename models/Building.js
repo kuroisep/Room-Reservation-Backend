@@ -6,16 +6,16 @@ const BuildingSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-
-    roomType: {
-        type: []
-    },
-
     roomID: {
         type: []
     },
     org: {
-        type: String
+        id: {
+            type: String
+        },
+        name: {
+            type: String
+        }
     }
 })
 

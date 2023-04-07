@@ -11,21 +11,21 @@ const RoomSchema = new mongoose.Schema({
         type: String
     },
     Contributor: {
-        type: String,
-        required: true,
+        id: { type: String },
+        name: { type: String }
     },
-
     RoomType: {
-        type: String,
-        required: true,
+        id: { type: String },
+        name: { type: String }
     },
 
     Building: {
-        type: String,
-        required: true
+        id: { type: String },
+        name: { type: String }
     },
     Org: {
-        type: String
+        id: { type: String },
+        name: { type: String }
     },
     Seat: {
         type: Number,

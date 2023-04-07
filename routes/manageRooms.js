@@ -4,6 +4,7 @@ const router = express.Router();
 const RoomsModel = require('../models/Rooms');
 const BuildingModel = require('../models/Building');
 const RoomTypeModel = require('../models/RoomType');
+const UsersModel = require('../models/Users');
 const OrgModel = require('../models/Org')
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary');
@@ -47,13 +48,14 @@ router.post('/building', async (req, res) => {
     const Organization = await OrgModel.findById(req.body.org)
 
     const name = req.body.name
-    const roomType = req.body.roomType
     const roomID = req.body.roomID
-    const org = Organization.name
+    const org = {
+        id: req.body.org,
+        name: Organization.name
+    }
 
     const Building = new BuildingModel({
         name: name,
-        roomType: roomType,
         roomID: roomID,
         org: org
     });
@@ -107,18 +109,18 @@ router.delete('/building/:id', async (req, res) => {
 
 router.post('/roomtype', async (req, res) => {
 
+    const organization = await OrgModel.findById(req.body.org)
+
     const name = req.body.name
-    const building = req.body.building
+    const org = {
+        id: req.body.org,
+        name: organization.name
+    }
     const roomID = req.body.roomID
-
-    const build = await BuildingModel.findById(req.body.building)
-
-    const org = build.org
-    const organization = await OrgModel.findOne({ name: org })
 
     const RoomTypes = new RoomTypeModel({
         name: name,
-        building: building,
+        org: org,
         roomID: roomID
     });
 
@@ -194,15 +196,25 @@ router.post('/room', upload.single('image'), async (req, res) => {
 
     const Build = await BuildingModel.findById(req.body.Building);
     const RoomT = await RoomTypeModel.findById(req.body.RoomType);
+    const cont = await UsersModel.findById(req.body.Contributor);
 
     cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, result) => {
 
         const Name = req.body.Name
         const Detail = req.body.Detail
         const Contributor = req.body.Contributor
-        const RoomType = RoomT.name
-        const Building = Build.name
-        const Org = Build.org
+        const RoomType = {
+            id: req.body.RoomType,
+            name: RoomT.name
+        }
+        const Building = {
+            id: req.body.Building,
+            name: Build.name
+        }
+        const Org = {
+            id: Build.org.id,
+            name: Build.org.name
+        }
         const Seat = req.body.Seat
         const Size = req.body.Size
         const Object = req.body.Object

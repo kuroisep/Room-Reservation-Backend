@@ -17,6 +17,9 @@ router.post('/', async (req, res) => {
     const statusID = req.body.statusID
     const reqID = req.body.reqID
 
+    const nameExist = await OrgModel.findOne({ name: req.body.name })
+    if (nameExist) return res.status(400).send('Organization already exist');
+
     const Org = new OrgModel({
         name: name,
         roomID: roomID,

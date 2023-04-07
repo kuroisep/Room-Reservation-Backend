@@ -5,14 +5,12 @@ const StatusSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    priority: {
-        type: String,
-    },
     userID: {
         type: []
     },
     org: {
-        type: String
+        id: { type: String },
+        name: { type: String }
     }
 })
 
