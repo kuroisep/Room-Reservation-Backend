@@ -240,11 +240,12 @@ router.get('/search/:key', async (req, res) => {
 
     let result = await UsersModel.find({
         "$or": [
-            { user: { $regex: req.params.key } },
+            { username: { $regex: req.params.key } },
             { firstname: { $regex: req.params.key } },
             { lastname: { $regex: req.params.key } },
-            { Status: { $regex: req.params.key } },
-            { Role: { $regex: req.params.key } },
+            { email: { $regex: req.params.key } },
+            { status: { $regex: req.params.key } },
+            { role: { $regex: req.params.key } },
         ]
     })
     res.send(result);
