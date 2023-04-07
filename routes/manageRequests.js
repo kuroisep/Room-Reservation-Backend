@@ -7,20 +7,36 @@ const UserModel = require('../models/Users');
 const auth = require('../middleware/auth');
 const RoomModel = require('../models/Rooms');
 const OrgModel = require('../models/Org');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const BuildingModel = require('../models/Building');
 
 router.post('/', async (req, res) => {
-    const User = await UserModel.findById(req.body.UserID)
+    const userid = await UserModel.findById(req.body.UserID)
     const Rooms = await RoomModel.findById(req.body.Room)
 
-    // Org = mongoose.Types.ObjectId(User.org)
+    const Organization = await OrgModel.findById(userid.org.id)
 
+<<<<<<< Updated upstream
     // const Organization = await OrgModel.findOne({ name: User.org })
 
     const Room = Rooms.Name
     const Building = Rooms.Building
     const UserID = req.body.UserID
     const username = User.username
+=======
+    const Room = {
+        id: req.body.Room,
+        name: Rooms.Name
+    }
+    const Building = {
+        id: Rooms.Building.id,
+        name: Rooms.Building.name
+    }
+    const username = {
+        id: req.body.User,
+        username: userid.username
+    }
+>>>>>>> Stashed changes
     const startTime = req.body.startTime
     const endTime = req.body.endTime
     const repeatDate = req.body.repeatDate
@@ -36,9 +52,7 @@ router.post('/', async (req, res) => {
     const Requests = new RequestsModel({
         Room: Room,
         Building: Building,
-        UserID: UserID,
-        username: username,
-        username: username,
+        User: username,
         startTime: startTime,
         endTime: endTime,
         repeatDate: repeatDate,
@@ -52,6 +66,9 @@ router.post('/', async (req, res) => {
         Purpose: Purpose
     });
 
+    Organization.reqID.push(Requests._id.toString())
+    Organization.save()
+
     try {
         Rooms.useCount = (Rooms.useCount) + 1
         Rooms.save()
@@ -60,6 +77,7 @@ router.post('/', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
+<<<<<<< Updated upstream
     /*
         for (let i = 0; i < startTime.length; i++) {
             const Event = new EventModel({
@@ -80,6 +98,8 @@ router.post('/', async (req, res) => {
             Organization.reqID.push(Event._id.toString())
             await Organization.save()
         }*/
+=======
+>>>>>>> Stashed changes
 })
 
 router.get('/', async (req, res) => {
@@ -98,21 +118,29 @@ router.put("/:id", async (req, res) => {
 
     const request = await RequestsModel.findById(id);
 
-    if (req.body.Room) {
+    if (req.body.Room || req.body.Building) {
         const Rooms = await RoomModel.findById(req.body.Room)
-        const newRoom = Rooms.Name;
-        const newBuilding = Rooms.Building
+        const Build = await BuildingModel.findById(req.body.Building)
+        const newRoom = {
+            id: req.body.Room,
+            name: Rooms.Name
+        }
+        const newBuilding = {
+            id: req.body.Building,
+            name: Rooms.Building
+        }
 
         request.Room = newRoom;
         request.Building = newBuilding
     }
     if (req.body.UserID) {
         const User = await UserModel.findById(req.body.UserID)
-        const newUserID = req.body.UserID
-        const newusername = User.username
+        const newUser = {
+            id: req.body.UserID,
+            name: User.name
+        }
 
-        request.UserID = newUserID
-        request.username = newusername
+        request.User = newUser
     }
     if (req.body.Object) {
         const newObject = req.body.
@@ -147,8 +175,7 @@ router.put("/:id", async (req, res) => {
                 const Event = new EventModel({
                     Room: request.Room,
                     Building: request.Building,
-                    UserID: request.UserID,
-                    username: request.username,
+                    User: request.User,
                     startTime: request.startTime[i][0],
                     endTime: request.endTime[i][0],
                     allDay: request.allDay,
@@ -159,6 +186,7 @@ router.put("/:id", async (req, res) => {
                 })
                 await Event.save();
 
+<<<<<<< Updated upstream
                 const User = await UserModel.findById(request.UserID)
 
                 let Organization;
@@ -172,6 +200,12 @@ router.put("/:id", async (req, res) => {
                 }
 
                 Organization.reqID.push(Event._id.toString())
+=======
+                const build = await BuildingModel.findById(request.Building.id)
+                const Organization = await OrgModel.findById(build.org.id)
+
+                Organization.eventID.push(Event._id.toString())
+>>>>>>> Stashed changes
                 await Organization.save()
             }
         }

@@ -55,24 +55,28 @@ router.get('/status', async (req, res) => {
 
 router.put("/status/:id", async (req, res) => {
 
-    const Organization = await OrgModel.findById(req.body.org)
-
-    const newname = req.body.name
-    const newpriority = req.body.priority
-    //   const neworg = Organization.name
-
     const id = req.params.id
-
     const status = await StatusModel.findById(id)
 
-    try {
+    if (req.body.org) {
+        const Organization = await OrgModel.findById(req.body.org)
+        status.org = {
+            id: req.body.org,
+            name: Organization.name
+        }
+    }
+
+    if (req.body.name) {
+        const newname = req.body.name
         status.name = newname
-        await status.save()
+    }
+
+    try {
+        status.save()
+        res.send("updated");
     } catch (err) {
         console.log(err);
     }
-
-    res.send("updated");
 })
 
 router.delete('/status/:id', async (req, res) => {

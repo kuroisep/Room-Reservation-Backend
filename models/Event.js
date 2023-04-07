@@ -9,12 +9,9 @@ const EventSchema = new mongoose.Schema({
     Building: {
         type: String
     },
-    UserID: {
-        type: String,
-        required: true,
-    },
-    username: {
-        type: String,
+    User: {
+        id: { type: String },
+        username: { type: String }
     },
     Object: {
         type: [],

@@ -22,6 +22,9 @@ const OrgSchema = new mongoose.Schema({
     },
     reqID: {
         type: []
+    },
+    eventID: {
+        type: []
     }
 });
 

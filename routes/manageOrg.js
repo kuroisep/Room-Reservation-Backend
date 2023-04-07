@@ -16,6 +16,7 @@ router.post('/', async (req, res) => {
     const userID = req.body.userID
     const statusID = req.body.statusID
     const reqID = req.body.reqID
+    const eventID = req.body.eventID
 
     const nameExist = await OrgModel.findOne({ name: req.body.name })
     if (nameExist) return res.status(400).send('Organization already exist');
@@ -27,7 +28,8 @@ router.post('/', async (req, res) => {
         buildingID: buildingID,
         userID: userID,
         statusID: statusID,
-        reqID: reqID
+        reqID: reqID,
+        eventID: eventID
     });
 
     try {
@@ -51,22 +53,20 @@ router.get('/', async (req, res) => {
 router.put("/:id", async (req, res) => {
 
     const id = req.params.id
-
-    const newname = req.body.name;
-
     const org = await OrgModel.findById(id);
 
+    if (req.body.name) {
+        const newname = req.body.name;
+        org.name = newname
+    }
+
     try {
-        org.name = newname,
-            org.orgType = neworgType,
-            org.profile = newprofile,
-            org.save();
+        org.save();
+        res.send("updated");
 
     } catch (err) {
         console.log(err);
     }
-
-    res.send("updated");
 })
 
 router.delete('/:id', async (req, res) => {

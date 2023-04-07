@@ -10,7 +10,7 @@ const RequestSchema = new mongoose.Schema({
     },
     User: {
         id: { type: String },
-        name: { type: String }
+        username: { type: String }
     },
     Object: {
         type: [],
