@@ -26,7 +26,7 @@ router.post('/status', async (req, res) => {
 
     const Status = new StatusModel({
         name: name,
-        priority: priority,
+        // priority: priority,
         userID: userID,
         org: org
     });
