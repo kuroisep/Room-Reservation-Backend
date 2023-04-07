@@ -118,6 +118,9 @@ const upload = multer(
 
 router.post('/', upload.single('image'), async (req, res) => {
 
+    const emailExist = await UsersModel.findOne({ email: req.body.email })
+    if (emailExist) return res.status(400).send('Email already exists');
+
     const Status = await StatusModel.findById(req.body.status);
     const Organization = await OrgModel.findById(req.body.org);
 
