@@ -220,7 +220,7 @@ router.get('/searchby/', async (req, res) => {
             match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
         }
         if (req.query.UserID) {
-            match.UserID = new RegExp(req.query.UserID, "i");
+            match.User = new RegExp(req.query.UserID, "i");
         }
         if (req.query.Room) {
             match.Room = new RegExp(req.query.Room, "i");

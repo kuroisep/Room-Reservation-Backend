@@ -342,13 +342,38 @@ router.get('/search/:key', async (req, res) => {
     res.send(result);
 })
 
-router.get('/searchby', (req, res) => {
+router.get('/searchby', async (req, res) => {
 
-    const searchField1 = req.query.Contributor;
-    RoomsModel.find({ Contributor: { $regex: searchField1, $options: '$i' } })
-        .then(data => {
-            res.send(data)
-        })
+    try {
+        let match = {};
+        if (req.query.Name) {
+            match.Name = new RegExp(req.query.Name, "i");
+        }
+        if (req.query.Contributor) {
+            match.Contributor = new RegExp(req.query.Contributor, "i");
+        }
+        if (req.query.RoomType) {
+            match.RoomType = new RegExp(req.query.RoomType, "i");
+        }
+        if (req.query.Building) {
+            match.Building = new RegExp(req.query.Building, "i");
+        }
+        if (req.query.Org) {
+            match.Org = new RegExp(req.query.Org, "i")
+        }
+        if (req.query.Seat) {
+            match.Seat = new RegExp(req.query.Seat, "i")
+        }
+        if (req.query.Object) {
+            match.Object = new RegExp(req.query.Object, "i")
+        }
+
+        const result = await RequestsModel.aggregate([{ $match: match }]);
+
+        res.send(result)
+    } catch (err) {
+        res.status(500).send(err);
+    }
 })
 
 router.get('/building/:id', (req, res) => {

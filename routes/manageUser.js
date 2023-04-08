@@ -272,12 +272,19 @@ router.get('/search/:key', async (req, res) => {
     res.send(result);
 })
 
-router.get('/searchby', (req, res) => {
-    const searchedField = req.query.Status;
-    UsersModel.find({ Status: { $regex: searchedField, $options: '$i' } })
-        .then(data => {
-            res.send(data)
-        })
+router.get('/searchby', async (req, res) => {
+    try {
+        let match = {};
+        if (req.query.role) {
+            match.role = new RegExp(req.query.role, "i");
+        }
+
+        const result = await UsersModel.aggregate([{ $match: match }]);
+
+        res.send(result)
+    } catch (err) {
+        res.status(500).send(err);
+    }
 })
 
 router.get('/userprofile', (req, res) => {
@@ -297,6 +304,16 @@ router.get('/userprofile', (req, res) => {
     UsersModel.findOne({ _id: userId }).then(function (user) {
         res.send(user)
     });
+})
+
+router.get('/statususer/:id', async (req, res) => {
+    const id = req.params.id
+    const status = await StatusModel.findOne({ _id: id })
+
+    const users = status.userID
+    UsersModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) } }).then(data => {
+        res.send(data)
+    })
 })
 
 module.exports = router;
