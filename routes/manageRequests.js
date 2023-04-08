@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
 
     const User = {
         id: req.body.UserID,
-        name: userid.username
+        username: userid.username
     }
     const Room = {
         id: req.body.Room,
