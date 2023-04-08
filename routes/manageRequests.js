@@ -61,7 +61,7 @@ router.post('/', async (req, res) => {
     });
 
     Organization.reqID.push(Requests._id.toString())
-    Organization.save()
+    await Organization.save()
 
     try {
         Rooms.useCount = (Rooms.useCount) + 1
