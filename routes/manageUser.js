@@ -208,8 +208,14 @@ router.put("/:id", upload.single('image'), async (req, res) => {
     const newfirstname = req.body.firstname
     const newlastname = req.body.lastname
     const newemail = req.body.email
-    const newstatus = Status.name
-    const neworg = Organization.name
+    const newstatus = {
+        id: req.body.status,
+        name: Status.name
+    }
+    const neworg = {
+        id: req.body.org,
+        name: Organization.name
+    }
     const newrole = req.body.role
 
     if (req.body.image !== '') {

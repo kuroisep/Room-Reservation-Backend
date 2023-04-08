@@ -124,9 +124,6 @@ router.post('/roomtype', async (req, res) => {
         roomID: roomID
     });
 
-    build.roomType.push(RoomTypes._id.toString())
-    await build.save()
-
     organization.roomTypeID.push(RoomTypes._id.toString())
     await organization.save()
 
