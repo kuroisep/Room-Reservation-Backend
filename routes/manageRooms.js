@@ -221,7 +221,7 @@ router.post('/room', upload.single('image'), async (req, res) => {
             url: result.secure_url
         }
 
-        const organization = await OrgModel.findOne({ name: Org })
+        const organization = await OrgModel.findById(Build.org.id)
 
         const Rooms = new RoomsModel({
             Name: Name,
@@ -238,16 +238,16 @@ router.post('/room', upload.single('image'), async (req, res) => {
         });
 
         organization.roomID.push(Rooms._id.toString())
-        organization.save()
+        await organization.save()
 
         Build.roomID.push(Rooms._id.toString())
-        Build.save()
+        await Build.save()
 
         RoomT.roomID.push(Rooms._id.toString())
-        RoomT.save()
+        await RoomT.save()
 
         try {
-            Rooms.save();
+            await Rooms.save();
             res.send('Success')
         } catch (err) {
             res.send(err)
