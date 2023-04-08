@@ -2,15 +2,17 @@ const mongoose = require('mongoose')
 
 const RequestSchema = new mongoose.Schema({
     Room: {
-        type: String,
-        required: true
+        id: { type: String },
+        name: { type: String }
     },
     Building: {
-        type: String
+        id: { type: String },
+        name: { type: String }
     },
     User: {
         id: { type: String },
         username: { type: String }
+
     },
     Object: {
         type: [],

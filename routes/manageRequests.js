@@ -25,9 +25,10 @@ router.post('/', async (req, res) => {
         id: req.body.Room,
         name: Rooms.Name
     }
+    const build = await BuildingModel.findById(Rooms.Building.id)
     const Building = {
-        id: Rooms.Building.id,
-        name: Rooms.Building.name
+        id: build.id,
+        name: build.name
     }
 
     const startTime = req.body.startTime
@@ -64,7 +65,7 @@ router.post('/', async (req, res) => {
 
     try {
         Rooms.useCount = (Rooms.useCount) + 1
-        Rooms.save()
+        await Rooms.save()
         await Requests.save()
         res.send('Success')
     } catch (err) {
