@@ -30,13 +30,13 @@ router.get('/', async (req, res) => {
     if (typeof User.org === 'object' && typeof User.org.id === 'string') {
         org = await OrgModel.findById(User.org.id);
     } else
-    if (typeof User.org === 'string') {
-        org = await OrgModel.findOne({ name: User.org });
-    } else {
-        return res.status(500).send('invalid org format');
-    }
+        if (typeof User.org === 'string') {
+            org = await OrgModel.findOne({ name: User.org });
+        } else {
+            return res.status(500).send('invalid org format');
+        }
 
-    EventModel.find({ 'id': { $in: [org.reqID] }, Status_Approve: "Approved" }).then(data => {
+    EventModel.find({ 'id': { $in: [org.eventID] }, Status_Approve: "Approved" }).then(data => {
         res.send(data)
     });
 })
