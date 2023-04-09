@@ -331,11 +331,11 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
         }
     }
 
-    room.Name   = req.body.Name     || room.Name;
-    room.Detail = req.body.Detail   || room.Detail;
-    room.Seat   = req.body.Seat     || room.Seat;
-    room.Size   = req.body.Size     || room.Size;
-    room.Object = req.body.Object   || room.Object;
+    room.Name = req.body.Name || room.Name;
+    room.Detail = req.body.Detail || room.Detail;
+    room.Seat = req.body.Seat || room.Seat;
+    room.Size = req.body.Size || room.Size;
+    room.Object = req.body.Object || room.Object;
 
     try {
         await room.save();
@@ -440,7 +440,17 @@ router.get('/buildingroom/:id', async (req, res) => {
     const building = await BuildingModel.findOne({ _id: id })
 
     const rooms = building.roomID
-    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
+        res.send(data)
+    })
+})
+
+router.get('/roomtyperoom/:id', async (req, res) => {
+    const id = req.params.id
+    const roomtype = await RoomTypeModel.findOne({ _id: id })
+
+    const rooms = roomtype.roomID;
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
         res.send(data)
     })
 })

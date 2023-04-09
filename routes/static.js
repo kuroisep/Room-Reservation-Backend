@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const RequestsModel = require('../models/Requests')
 const RoomModel = require('../models/Rooms')
+const OrgModel = require('../models/Org')
 
 router.get('/', async (req, res) => {
 
@@ -60,6 +61,26 @@ router.get('/searchby/', async (req, res) => {
     } catch (err) {
         res.status(500).send(err);
     }
+})
+
+router.get('/buildingroom/:id', async (req, res) => {
+    const id = req.params.id
+    const building = await BuildingModel.findOne({ _id: id })
+
+    const rooms = building.roomID
+    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
+        res.send(data)
+    })
+})
+
+router.get('/org/room/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.findOne({ _id: id })
+
+    const rooms = org.roomID
+    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
+        res.send(data)
+    })
 })
 
 module.exports = router
