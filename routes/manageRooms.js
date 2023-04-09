@@ -190,69 +190,75 @@ const upload = multer(
 );
 
 router.post('/room', upload.single('image'), async (req, res) => {
-
     const Build = await BuildingModel.findById(req.body.Building);
     const RoomT = await RoomTypeModel.findById(req.body.RoomType);
-    const cont = await UsersModel.findById(req.body.Contributor);
+    const Cont = await UsersModel.findById(req.body.Contributor);
 
-    cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, result) => {
+    if (req.file === undefined) {
+        res.status(400).send('Must have image')
+    }
 
-        const Name = req.body.Name
-        const Detail = req.body.Detail
-        const Contributor = req.body.Contributor
-        const RoomType = {
-            id: req.body.RoomType,
-            name: RoomT.name
-        }
-        const Building = {
-            id: req.body.Building,
-            name: Build.name
-        }
-        const Org = {
-            id: Build.org.id,
-            name: Build.org.name
-        }
-        const Seat = req.body.Seat
-        const Size = req.body.Size
-        const Object = req.body.Object
-        const useCount = req.body.useCount
-        const image = {
-            public_id: result.public_id,
-            url: result.secure_url
-        }
+    const imageValue = await cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" });
+    // Remove local temp file ??
 
-        const organization = await OrgModel.findById(Build.org.id)
+    const Name = req.body.Name
+    const Detail = req.body.Detail
+    const Contributor = {
+        id: req.body.Contributor,
+        name: Cont.email
+    }
+    const RoomType = {
+        id: req.body.RoomType,
+        name: RoomT.name
+    }
+    const Building = {
+        id: req.body.Building,
+        name: Build.name
+    }
+    const Org = {
+        id: Build.org.id,
+        name: Build.org.name
+    }
+    const Seat = req.body.Seat
+    const Size = req.body.Size
+    const Object = req.body.Object
+    const useCount = req.body.useCount
+    const image = {
+        public_id: imageValue.public_id,
+        url: imageValue.secure_url
+    }
 
-        const Rooms = new RoomsModel({
-            Name: Name,
-            Detail: Detail,
-            Contributor: Contributor,
-            RoomType: RoomType,
-            Building: Building,
-            Org: Org,
-            Seat: Seat,
-            Size: Size,
-            Object: Object,
-            useCount: useCount,
-            image: image
-        });
+    const organization = await OrgModel.findById(Build.org.id)
 
-        organization.roomID.push(Rooms._id.toString())
-        await organization.save()
+    const Rooms = new RoomsModel({
+        Name: Name,
+        Detail: Detail,
+        Contributor: Contributor,
+        RoomType: RoomType,
+        Building: Building,
+        Org: Org,
+        Seat: Seat,
+        Size: Size,
+        Object: Object,
+        useCount: useCount,
+        image: image
+    });
 
-        Build.roomID.push(Rooms._id.toString())
-        await Build.save()
+    organization.roomID.push(Rooms._id.toString())
+    await organization.save()
 
-        RoomT.roomID.push(Rooms._id.toString())
-        await RoomT.save()
+    Build.roomID.push(Rooms._id.toString())
+    await Build.save()
 
-        try {
-            await Rooms.save();
-            res.send('Success')
-        } catch (err) {
-            res.send(err)
-        }
-    })
+    RoomT.roomID.push(Rooms._id.toString())
+    await RoomT.save()
+
+    try {
+        await Rooms.save();
+        res.send('Success')
+    } catch (err) {
+        res.status(500).send(err)
+    }
 });
 
 
@@ -269,52 +275,78 @@ router.get('/room', paginatedResults(RoomsModel), async (req, res) => {
 
 
 router.put("/room/:id", upload.single('image'), async (req, res) => {
-
     const room = await RoomsModel.findById(req.params.id);
-    const Build = await BuildingModel.findById(req.body.Building);
-    const RoomT = await RoomTypeModel.findById(req.body.RoomType);
 
-    const newName = req.body.Name
-    const newDetail = req.body.Detail
-    const newContributor = req.body.Contributor
-    const newRoomType = RoomT.name
-    const newBuilding = Build.name
-    const newOrg = Build.org
-    const newSeat = req.body.Seat
-    const newSize = req.body.Size
-    const newObject = req.body.Object
-
-    if (req.body.image !== '') {
+    if (req.file) {
         const imgid = room.image.public_id;
         if (imgid) {
             await cloudinary.v2.uploader.destroy(imgid);
         }
 
-        await cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" }, async (error, newresult) => {
-            room.image = {
-                public_id: newresult.public_id,
-                url: newresult.secure_url
-            }
-        })
+        const imageValue = await cloudinary.v2.uploader.upload(req.file.path, { folder: "rooms" })
+        // Remove local temp file ??
+        room.image = {
+            public_id: imageValue.public_id,
+            url: imageValue.secure_url
+        }
     }
 
-    room.Name = newName
-    room.Detail = newDetail
-    room.Contributor = newContributor
-    room.RoomType = newRoomType
-    room.Building = newBuilding
-    room.Org = newOrg
-    room.Seat = newSeat
-    room.Size = newSize
-    room.Object = newObject
+    let BuildOld;
+    let OrgOld;
+    let RoomTOld;
+
+    if (req.body.Building && req.body.Building != room.Building.id) {
+        const BuildNew = await BuildingModel.findById(req.body.Building)
+
+        room.Building = {
+            id: BuildNew._id,
+            name: BuildNew.name
+        }
+        room.Org = {
+            id: BuildNew.org._id,
+            name: BuildNew.org.name
+        }
+
+        BuildOld = await BuildingModel.findById(room.Building.id)
+        BuildOld.roomID = BuildOld.roomID.filter(e => e !== room._id.toString())
+        OrgOld = await OrgModel.findById(room.Org.id)
+        OrgOld.roomID = OrgOld.roomID.filter(e => e !== room._id.toString())
+    }
+    if (req.body.RoomType && req.body.RoomType != room.RoomType.id) {
+        const RoomTNew = await RoomTypeModel.findById(req.body.RoomType)
+
+        room.RoomType = {
+            id: RoomTNew._id,
+            name: RoomTNew.name
+        }
+
+        RoomTOld = await RoomTypeModel.findById(room.RoomType.id)
+        RoomTOld.roomID = RoomTOld.roomID.filter(e => e !== room._id.toString())
+    }
+    if (req.body.Contributor && req.body.Contributor != room.Contributor.id) {
+        const ContNew = await UsersModel.findById(req.body.Contributor)
+        room.Contributor = {
+            id: ContNew._id,
+            name: ContNew.email
+        }
+    }
+
+    room.Name   = req.body.Name     || room.Name;
+    room.Detail = req.body.Detail   || room.Detail;
+    room.Seat   = req.body.Seat     || room.Seat;
+    room.Size   = req.body.Size     || room.Size;
+    room.Object = req.body.Object   || room.Object;
 
     try {
-        room.save();
+        await room.save();
+        await BuildOld?.save();
+        await OrgOld?.save();
+        await RoomTOld?.save()
         res.send("updated");
     } catch (err) {
+        res.status(500).send(err)
         console.log(err);
     }
-
 })
 
 router.delete('/room/:id', async (req, res) => {
