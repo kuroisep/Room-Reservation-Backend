@@ -218,7 +218,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
     }
     const newrole = req.body.role
 
-    if (req.body.image !== '') {
+    if (req.file) {
         const imgid = user.image.public_id;
         if (imgid) {
             await cloudinary.v2.uploader.destroy(imgid);
