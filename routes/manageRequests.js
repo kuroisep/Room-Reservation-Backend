@@ -157,7 +157,7 @@ router.put("/:id", async (req, res) => {
                 })
                 await Event.save();
 
-                const User = await UserModel.findById(request.UserID)
+                const User = await UserModel.findById(request.User.id)
 
                 let Organization;
                 if (typeof User.org === 'object' && typeof User.org.id === 'string') {
@@ -216,19 +216,24 @@ router.get('/search/:key', async (req, res) => {
 
 router.get('/searchby/', async (req, res) => {
     try {
-        let match = {};
-        if (req.query.Status_Approve) {
-            match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
+        const addCondition = (key, value) => {
+            let ret = {};
+            if (value) {
+                if (Array.isArray(value)) {
+                    ret[key] = { $in: value };
+                } else {
+                    ret[key] = value;
+                }
+            }
+            return ret;
         }
-        if (req.query.UserID) {
-            match.User = new RegExp(req.query.UserID, "i");
-        }
-        if (req.query.Room) {
-            match.Room = new RegExp(req.query.Room, "i");
-        }
-        if (req.query.Building) {
-            match.Building = new RegExp(req.query.Building, "i");
-        }
+
+        let match = {
+            ...addCondition("Status_Approve", req.query.Status_Approve),
+            ...addCondition("User.id", req.query.UserID),
+            ...addCondition("Room.id", req.query.RoomID),
+            ...addCondition("Building.id", req.query.BuildingID),
+        };
 
         const result = await RequestsModel.aggregate([{ $match: match }]);
 
