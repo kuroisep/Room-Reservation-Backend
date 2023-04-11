@@ -399,6 +399,9 @@ router.get('/searchby', async (req, res) => {
         if (req.query.Object) {
             match.Object = new RegExp(req.query.Object, "i")
         }
+        if (req.query.Size) {
+            match.Size = new RegExp(req.query.Size, "i")
+        }
 
         const result = await RequestsModel.aggregate([{ $match: match }]);
 
