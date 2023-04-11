@@ -44,8 +44,14 @@ router.post('/register', upload.single('image'), async (req, res) => {
         const firstname = req.body.firstname
         const lastname = req.body.lastname
         const email = req.body.email
-        const status = Status.name
-        const org = Organization.name
+        const status = {
+            id: Status._id,
+            name: Status.name
+        }
+        const org = {
+            id: Organization._id,
+            name: Organization.name
+        }
         const role = req.body.role
         const image = {
             public_id: result.public_id,
@@ -64,7 +70,7 @@ router.post('/register', upload.single('image'), async (req, res) => {
             image: image
         });
 
-        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
+        const token = jwt.sign({ _id: Users._id }, process.env.TOKEN_SECRET)
         Users.token = token
 
         Status.userID.push(Users._id.toString());
