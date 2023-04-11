@@ -90,6 +90,7 @@ router.put("/building/:id", async (req, res) => {
         building.save();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 
     res.send("updated");
@@ -377,33 +378,40 @@ router.get('/search/:key', async (req, res) => {
 router.get('/searchby', async (req, res) => {
 
     try {
-        let match = {};
-        if (req.query.Name) {
-            match.Name = new RegExp(req.query.Name, "i");
+        const addCondition = (key, value, caseSensitive, number) => {
+            let ret = {};
+            if (value) {
+                if (Array.isArray(value)) {
+                    ret[key] = { $in: value };
+                } else {
+                    if (caseSensitive) {
+                        ret[key] = new RegExp(value, "i");
+                    } else {
+                        if (number) {
+                            value = Number.parseInt(value)
+                        }
+                        ret[key] = value;
+                    }
+                }
+            }
+            return ret;
         }
-        if (req.query.Contributor) {
-            match.Contributor = new RegExp(req.query.Contributor, "i");
-        }
-        if (req.query.RoomType) {
-            match.RoomType = new RegExp(req.query.RoomType, "i");
-        }
-        if (req.query.Building) {
-            match.Building = new RegExp(req.query.Building, "i");
-        }
-        if (req.query.Org) {
-            match.Org = new RegExp(req.query.Org, "i")
-        }
-        if (req.query.Seat) {
-            match.Seat = new RegExp(req.query.Seat, "i")
-        }
+
+        let match = {
+            ...addCondition("Name", req.query.Name, true),
+            ...addCondition("Contributor.id", req.query.ContributorID),
+            ...addCondition("RoomType.id", req.query.RoomTypeID),
+            ...addCondition("Building.id", req.query.BuildingID),
+            ...addCondition("Org.id", req.query.OrgID),
+            ...addCondition("Seat", req.query.Seat, false, true),
+            ...addCondition("Size", req.query.Size, true),
+        };
+
         if (req.query.Object) {
             match.Object = new RegExp(req.query.Object, "i")
         }
-        if (req.query.Size) {
-            match.Size = new RegExp(req.query.Size, "i")
-        }
 
-        const result = await RequestsModel.aggregate([{ $match: match }]);
+        const result = await RoomsModel.aggregate([{ $match: match }]);
 
         res.send(result)
     } catch (err) {
