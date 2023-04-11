@@ -144,8 +144,8 @@ router.put("/:id", async (req, res) => {
             console.log(request.startTime.length)
             for (let i = 0; i < request.startTime.length; i++) {
                 const Event = new EventModel({
-                    Room: request.Room,
-                    Building: request.Building,
+                    Room: request.Room.name,
+                    Building: request.Building.name,
                     User: request.User,
                     startTime: request.startTime[i][0],
                     endTime: request.endTime[i][0],
