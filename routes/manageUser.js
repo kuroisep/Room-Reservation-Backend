@@ -274,19 +274,31 @@ router.get('/search/:key', async (req, res) => {
 
 router.get('/searchby', async (req, res) => {
     try {
-        let match = {};
-        if (req.query.role) {
-            match.role = new RegExp(req.query.role, "i");
+        const addCondition = (key, value, caseSensitive, number) => {
+            let ret = {};
+            if (value) {
+                if (Array.isArray(value)) {
+                    ret[key] = { $in: value };
+                } else {
+                    if (caseSensitive) {
+                        ret[key] = new RegExp(value, "i");
+                    } else {
+                        if (number) {
+                            value = Number.parseInt(value)
+                        }
+                        ret[key] = value;
+                    }
+                }
+            }
+            return ret;
         }
-        if (req.query.email){
-            match.email = new RegExp(req.query.email,"i")
-        }
-        if (req.query.status){
-            match.status = new RegExp(req.query.status,"i")
-        }
-        if (req.query.org){
-            match.org = new RegExp(req.query.org,"i")
-        }
+
+        let match = {
+            ...addCondition("role", req.query.role),
+            ...addCondition("email", req.query.email),
+            ...addCondition("status.id", req.query.status),
+            ...addCondition("org.id", req.query.org),
+        };
 
         const result = await UsersModel.aggregate([{ $match: match }]);
 
