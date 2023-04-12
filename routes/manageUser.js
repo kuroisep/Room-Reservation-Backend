@@ -295,7 +295,7 @@ router.get('/searchby', async (req, res) => {
 
         let match = {
             ...addCondition("role", req.query.role),
-            ...addCondition("email", req.query.email),
+            ...addCondition("email", req.query.email,true),
             ...addCondition("status.id", req.query.status),
             ...addCondition("org.id", req.query.org),
         };
