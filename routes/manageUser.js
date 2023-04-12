@@ -278,6 +278,15 @@ router.get('/searchby', async (req, res) => {
         if (req.query.role) {
             match.role = new RegExp(req.query.role, "i");
         }
+        if (req.query.email){
+            match.email = new RegExp(req.query.email,"i")
+        }
+        if (req.query.status){
+            match.status = new RegExp(req.query.status,"i")
+        }
+        if (req.query.org){
+            match.org = new RegExp(req.query.org,"i")
+        }
 
         const result = await UsersModel.aggregate([{ $match: match }]);
 
