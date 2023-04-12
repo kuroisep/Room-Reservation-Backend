@@ -197,26 +197,69 @@ router.get('/', async (req, res) => {
 router.put("/:id", upload.single('image'), async (req, res) => {
 
     const user = await UsersModel.findById(req.params.id)
-    const Status = await StatusModel.findById(req.body.status);
-    const Organization = await OrgModel.findById(req.body.org);
 
     const salt = await bcrypt.genSalt(10);
 
+    if(req.body.username){
+        const newusername = req.body.username
+        user.username = newusername
+    }
+    if(req.body.password){
+        const newpassword = await bcrypt.hash(req.body.password, salt);
+        user.password = newpassword
+    }
+    if(req.body.firstname){
+        const newfirstname = req.body.firstname
+        user.firstname = newfirstname
+    }
+    if(req.body.lastname){
+        const newlastname = req.body.lastname
+        user.lastname = newlastname
+    }
+    if(req.body.email){
+        const newemail = req.body.email
+        user.email = newemail
+    }
 
-    const newusername = req.body.username
-    //const newpassword = await bcrypt.hash(req.body.password, 10);
-    const newfirstname = req.body.firstname
-    const newlastname = req.body.lastname
-    const newemail = req.body.email
-    const newstatus = {
-        id: req.body.status,
-        name: Status.name
+    let OrgOld
+    let StatusOld
+    let OrgNew
+    let StatusNew
+
+    if (req.body.status && req.body.status != user.status.id){
+
+        StatusOld = await StatusModel.findById(user.status.id)
+        StatusOld.userID = StatusOld.userID.filter(e => e !== user._id.toString())
+        OrgOld = await OrgModel.findById(user.org.id)
+        OrgOld.userID = OrgOld.userID.filter(e => e !== user._id.toString())
+
+        StatusNew = await StatusModel.findById(req.body.status)
+        OrgNew = await OrgModel.findById(StatusNew.org.id)
+
+        user.status = {
+            id: req.body.status,
+            name: StatusNew.name
+        }
+        user.org = {
+            id: req.body.org,
+            name: OrgNew.name
+        }
     }
-    const neworg = {
-        id: req.body.org,
-        name: Organization.name
+    if(req.body.org && req.body.org !== user.org.id){
+
+        OrgOld = await OrgModel.findById(user.org.id)
+        OrgOld.userID = OrgOld.userID.filter(e => e !== user._id.toString())
+        OrgNew = await OrgModel.findById(StatusNew.org.id)
+
+        user.org = {
+            id: req.body.org,
+            name: OrgNew.name
+        }
     }
-    const newrole = req.body.role
+    if(req.body.role){
+        const newrole = req.body.role
+        user.role = newrole
+    }
 
     if (req.file) {
         const imgid = user.image.public_id;
@@ -231,18 +274,13 @@ router.put("/:id", upload.single('image'), async (req, res) => {
             }
         })
     }
-
-    user.username = newusername
-    // user.password = newpassword
-    user.firstname = newfirstname
-    user.lastname = newlastname
-    user.email = newemail
-    user.status = newstatus
-    user.role = newrole
-    user.org = neworg
-
+    
     try {
-        user.save()
+        await user.save()
+        await OrgOld?.save()
+        await StatusOld?.save()
+        await OrgNew?.save()
+        await StatusNew?.save()
         res.send("updated")
     } catch (err) {
         console.log(err)

@@ -9,6 +9,7 @@ const RoomModel = require('../models/Rooms');
 const OrgModel = require('../models/Org');
 const mongoose = require('mongoose');
 const BuildingModel = require('../models/Building');
+const RoomTypeModel = require('../models/RoomType')
 
 router.post('/', async (req, res) => {
     const userid = await UserModel.findById(req.body.UserID)
@@ -16,6 +17,7 @@ router.post('/', async (req, res) => {
 
     const Organization = await OrgModel.findById(userid.org.id)
     // const Organization = await OrgModel.findOne({ name: User.org })
+    const roomt = await RoomTypeModel.findById(Rooms.RoomType.id)
 
     const User = {
         id: req.body.UserID,
@@ -24,6 +26,10 @@ router.post('/', async (req, res) => {
     const Room = {
         id: req.body.Room,
         name: Rooms.Name
+    }
+    const RoomType = {
+        id: roomt.id,
+        name: roomt.name
     }
     const build = await BuildingModel.findById(Rooms.Building.id)
     const Building = {
@@ -49,6 +55,7 @@ router.post('/', async (req, res) => {
 
     const Requests = new RequestsModel({
         Room: Room,
+        RoomType: RoomType,
         Building: Building,
         User: User,
         Org: Org,
@@ -146,11 +153,13 @@ router.put("/:id", async (req, res) => {
         request.Status_Approve = req.body.Status_Approve
 
         if (request.Status_Approve == 'Approved') {
-            console.log(request.startTime.length)
+          //  console.log(request.startTime.length)
             for (let i = 0; i < request.startTime.length; i++) {
                 const Event = new EventModel({
                     Room: request.Room,
+                    RoomType: request.RoomType,
                     Building: request.Building,
+                    Org: request.Org,
                     User: request.User,
                     startTime: request.startTime[i][0],
                     endTime: request.endTime[i][0],

@@ -6,7 +6,15 @@ const EventSchema = new mongoose.Schema({
         id: {type: String},
         name: {type: String}
     },
+    RoomType: {
+        id: {type: String},
+        name: {type: String}
+    },
     Building: {
+        id: { type: String },
+        name: { type: String }
+    },
+    Org: {
         id: {type: String},
         name: {type: String}
     },

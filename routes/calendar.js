@@ -43,19 +43,31 @@ router.get('/', async (req, res) => {
 
 router.get('/searchby/', async (req, res) => {
     try {
-        let match = {};
-        if (req.query.Status_Approve) {
-            match.Status_Approve = new RegExp(req.query.Status_Approve, "i");
+        const addCondition = (key, value, caseSensitive, number) => {
+            let ret = {};
+            if (value) {
+                if (Array.isArray(value)) {
+                    ret[key] = { $in: value };
+                } else {
+                    if (caseSensitive) {
+                        ret[key] = new RegExp(value, "i");
+                    } else {
+                        if (number) {
+                            value = Number.parseInt(value)
+                        }
+                        ret[key] = value;
+                    }
+                }
+            }
+            return ret;
         }
-        if (req.query.UserID) {
-            match.UserID = new RegExp(req.query.UserID, "i");
-        }
-        if (req.query.Room) {
-            match.Room = new RegExp(req.query.Room, "i");
-        }
-        if (req.query.Building) {
-            match.Building = new RegExp(req.query.Building, "i");
-        }
+
+        let match = {
+            ...addCondition("Room.id", req.query.Room),
+            ...addCondition("RoomType.id", req.query.RoomType),
+            ...addCondition("Building.id", req.query.Building),
+            ...addCondition("Org.id", req.query.Org),
+        };
 
         const result = await EventModel.aggregate([{ $match: match }]);
 
