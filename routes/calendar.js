@@ -10,7 +10,7 @@ const BuildingModel = require('../models/Building');
 
 require("dotenv").config();
 
-/*router.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
 
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split(' ')[1], decoded;
@@ -24,22 +24,14 @@ require("dotenv").config();
     }
 
     var userId = decoded._id;
-    const User = await UserModel.findOne({ _id: userId })
+    const User = await UserModel.findById(userId)
 
-    let org;
-    if (typeof User.org === 'object' && typeof User.org.id === 'string') {
-        org = await OrgModel.findById(User.org.id);
-    } else
-        if (typeof User.org === 'string') {
-            org = await OrgModel.findOne({ name: User.org });
-        } else {
-            return res.status(500).send('invalid org format');
-        }
-
-    EventModel.find({ 'id': { $in: [org.eventID] }, Status_Approve: "Approved" }).then(data => {
+    org = await OrgModel.findById(User.org.id);
+  
+    EventModel.find({ "Org.id":org._id  } ).then(data => {
         res.send(data)
     });
-})*/
+})
 
 router.get('/searchby/', async (req, res) => {
     try {
