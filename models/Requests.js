@@ -9,6 +9,10 @@ const RequestSchema = new mongoose.Schema({
         id: { type: String },
         name: { type: String }
     },
+    Org: {
+        id: {type: String},
+        name: {type: String}
+    },
     User: {
         id: { type: String },
         username: { type: String }

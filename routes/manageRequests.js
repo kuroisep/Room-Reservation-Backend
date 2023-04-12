@@ -30,6 +30,10 @@ router.post('/', async (req, res) => {
         id: build.id,
         name: build.name
     }
+    const Org = {
+        id: Organization.id,
+        name: Organization.name
+    }
 
     const startTime = req.body.startTime
     const endTime = req.body.endTime
@@ -47,6 +51,7 @@ router.post('/', async (req, res) => {
         Room: Room,
         Building: Building,
         User: User,
+        Org: Org,
         startTime: startTime,
         endTime: endTime,
         repeatDate: repeatDate,
