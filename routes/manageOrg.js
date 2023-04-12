@@ -8,6 +8,7 @@ const UserModel = require('../models/Users');
 const StatusModel = require('../models/Status');
 const EventModel = require('../models/Event')
 const RoomTypeModel = require('../models/RoomType')
+const RequestModel = require('../models/Requests')
 
 router.post('/', async (req, res) => {
     const name = req.body.name
@@ -136,7 +137,7 @@ router.get('/request/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const request = org.reqID
-    EventModel.find({ _id: { $in: request.map((request) => new mongoose.Types.ObjectId(request)) } }).then(data => {
+    RequestModel.find({ _id: { $in: request.map((request) => new mongoose.Types.ObjectId(request)) } }).then(data => {
         res.send(data)
     })
 })
