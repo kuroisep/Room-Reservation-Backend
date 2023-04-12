@@ -10,7 +10,7 @@ const BuildingModel = require('../models/Building');
 
 require("dotenv").config();
 
-router.get('/', async (req, res) => {
+/*router.get('/', async (req, res) => {
 
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split(' ')[1], decoded;
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
     EventModel.find({ 'id': { $in: [org.eventID] }, Status_Approve: "Approved" }).then(data => {
         res.send(data)
     });
-})
+})*/
 
 router.get('/searchby/', async (req, res) => {
     try {

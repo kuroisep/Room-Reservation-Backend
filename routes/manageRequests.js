@@ -72,9 +72,6 @@ router.post('/', async (req, res) => {
         Purpose: Purpose
     });
 
-    Organization.reqID.push(Requests._id.toString())
-    await Organization.save()
-
     try {
         Rooms.useCount = (Rooms.useCount) + 1
         await Rooms.save()
@@ -172,22 +169,6 @@ router.put("/:id", async (req, res) => {
                 await Event.save();
 
                 const User = await UserModel.findById(request.User.id)
-
-                let Organization;
-                if (typeof User.org === 'object' && typeof User.org.id === 'string') {
-                    Organization = await OrgModel.findById(User.org.id);
-                } else
-                    if (typeof User.org === 'string') {
-                        Organization = await OrgModel.findOne({ name: User.org });
-                    } else {
-                        return res.status(500).send('invalid org format');
-                    }
-
-                //   const build = await BuildingModel.findById(request.Building.id)
-                //   const Organization = await OrgModel.findById(build.org.id)
-
-                Organization.eventID.push(Event._id.toString())
-                await Organization.save()
             }
         }
         if (req.body.Seat) {

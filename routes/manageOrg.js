@@ -17,8 +17,6 @@ router.post('/', async (req, res) => {
     const buildingID = req.body.buildingID
     const userID = req.body.userID
     const statusID = req.body.statusID
-    const reqID = req.body.reqID
-    const eventID = req.body.eventID
 
     const nameExist = await OrgModel.findOne({ name: req.body.name })
     if (nameExist) return res.status(400).send('Organization already exist');
@@ -30,8 +28,6 @@ router.post('/', async (req, res) => {
         buildingID: buildingID,
         userID: userID,
         statusID: statusID,
-        reqID: reqID,
-        eventID: eventID
     });
 
     try {
@@ -132,15 +128,6 @@ router.get('/status/:id', async (req, res) => {
     })
 })
 
-router.get('/request/:id', async (req, res) => {
-    const id = req.params.id
-    const org = await OrgModel.findOne({ _id: id })
-
-    const request = org.reqID
-    RequestModel.find({ _id: { $in: request.map((request) => new mongoose.Types.ObjectId(request)) } }).then(data => {
-        res.send(data)
-    })
-})
 
 router.get('/roomtype/:id', async (req, res) => {
     const id = req.params.id

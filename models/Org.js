@@ -20,12 +20,6 @@ const OrgSchema = new mongoose.Schema({
     statusID: {
         type: []
     },
-    reqID: {
-        type: []
-    },
-    eventID: {
-        type: []
-    }
 });
 
 const OrgModel = mongoose.model('orgs', OrgSchema)
