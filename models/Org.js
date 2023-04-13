@@ -1,3 +1,4 @@
+const { boolean } = require('joi');
 const mongoose = require('mongoose')
 
 const OrgSchema = new mongoose.Schema({
@@ -20,6 +21,10 @@ const OrgSchema = new mongoose.Schema({
     statusID: {
         type: []
     },
+    active: {
+        type: Boolean,
+        default: true
+    }
 });
 
 const OrgModel = mongoose.model('orgs', OrgSchema)

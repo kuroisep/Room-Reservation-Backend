@@ -16,6 +16,10 @@ const BuildingSchema = new mongoose.Schema({
         name: {
             type: String
         }
+    },
+    active: {
+        type: Boolean,
+        default: true
     }
 })
 

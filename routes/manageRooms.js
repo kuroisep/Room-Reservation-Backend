@@ -53,11 +53,13 @@ router.post('/building', async (req, res) => {
         id: req.body.org,
         name: Organization.name
     }
+    const active = req.body.active
 
     const Building = new BuildingModel({
         name: name,
         roomID: roomID,
-        org: org
+        org: org,
+        active: active
     });
 
     await Building.save();
@@ -99,7 +101,9 @@ router.put("/building/:id", async (req, res) => {
 router.delete('/building/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await BuildingModel.findByIdAndRemove(id).exec()
+        const building = await BuildingModel.findById(id)
+        building.active = false
+        await building.save()
         res.send("itemdeleted");
     }
     catch (err) {

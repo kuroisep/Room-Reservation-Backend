@@ -17,6 +17,7 @@ router.post('/', async (req, res) => {
     const buildingID = req.body.buildingID
     const userID = req.body.userID
     const statusID = req.body.statusID
+    const active = req.body.active
 
     const nameExist = await OrgModel.findOne({ name: req.body.name })
     if (nameExist) return res.status(400).send('Organization already exist');
@@ -28,6 +29,7 @@ router.post('/', async (req, res) => {
         buildingID: buildingID,
         userID: userID,
         statusID: statusID,
+        active: active
     });
 
     try {
@@ -39,7 +41,7 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    OrgModel.find({}, (err, result) => {
+    OrgModel.find({active: true}, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -70,7 +72,9 @@ router.put("/:id", async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await OrgModel.findByIdAndRemove(id).exec()
+        const org = await OrgModel.findById(id)
+        org.active = false
+        await org.save()
         res.send("itemdeleted");
     }
     catch (err) {
@@ -103,7 +107,7 @@ router.get('/building/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const buildings = org.buildingID
-    BuildingModel.find({ _id: { $in: buildings.map((buildings) => new mongoose.Types.ObjectId(buildings)) } }).then(data => {
+    BuildingModel.find({ _id: { $in: buildings.map((buildings) => new mongoose.Types.ObjectId(buildings)) }, active:true }).then(data => {
         res.send(data)
     })
 })

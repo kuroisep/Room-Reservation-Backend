@@ -16,6 +16,10 @@ const RoomTypeSchema = new mongoose.Schema({
     },
     roomID: {
         type: []
+    },
+    active: {
+        type: Boolean,
+        default: true
     }
 })
 
