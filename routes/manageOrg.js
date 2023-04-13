@@ -107,7 +107,7 @@ router.get('/building/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const buildings = org.buildingID
-    BuildingModel.find({ _id: { $in: buildings.map((buildings) => new mongoose.Types.ObjectId(buildings)) }, active:true }).then(data => {
+    BuildingModel.find({ _id: { $in: buildings.map((buildings) => new mongoose.Types.ObjectId(buildings)) }, active: true }).then(data => {
         res.send(data)
     })
 })

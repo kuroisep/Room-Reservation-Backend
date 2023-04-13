@@ -11,6 +11,10 @@ const StatusSchema = new mongoose.Schema({
     org: {
         id: { type: String },
         name: { type: String }
+    },
+    active: {
+        type: Boolean,
+        default: true
     }
 })
 

@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 
     org = await OrgModel.findById(User.org.id);
   
-    EventModel.find({ "Org.id":org._id  } ).then(data => {
+    EventModel.find({ "Org.id":org._id } ).then(data => {
         res.send(data)
     });
 })
@@ -59,6 +59,7 @@ router.get('/searchby/', async (req, res) => {
             ...addCondition("RoomType.id", req.query.RoomType),
             ...addCondition("Building.id", req.query.Building),
             ...addCondition("Org.id", req.query.Org),
+            ...addCondition("active", true),
         };
 
         const result = await EventModel.aggregate([{ $match: match }]);

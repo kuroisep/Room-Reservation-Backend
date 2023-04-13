@@ -188,8 +188,10 @@ router.put("/:id", async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await RequestsModel.findByIdAndRemove(id).exec()
-        res.send("itemdeleted");
+        const request = await RequestsModel.findById(id)
+        request.Status_Approve = "Cancled"
+        await request.save()
+        res.send("Request Status is cancled");
     }
     catch (err) {
         console.log(err);

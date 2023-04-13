@@ -71,7 +71,7 @@ router.post('/building', async (req, res) => {
 
 
 router.get('/building', async (req, res) => {
-    BuildingModel.find({}, (err, result) => {
+    BuildingModel.find({ active: true }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -104,7 +104,7 @@ router.delete('/building/:id', async (req, res) => {
         const building = await BuildingModel.findById(id)
         building.active = false
         await building.save()
-        res.send("itemdeleted");
+        res.send("active status is false");
     }
     catch (err) {
         console.log(err);
@@ -140,7 +140,7 @@ router.post('/roomtype', async (req, res) => {
 
 
 router.get('/roomtype', async (req, res) => {
-    RoomTypeModel.find({}, (err, result) => {
+    RoomTypeModel.find({ active: true }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -236,6 +236,7 @@ router.post('/room', upload.single('image'), async (req, res) => {
         public_id: imageValue.public_id,
         url: imageValue.secure_url
     }
+    const active = req.body.active
 
     const organization = await OrgModel.findById(Build.org.id)
 
@@ -250,7 +251,8 @@ router.post('/room', upload.single('image'), async (req, res) => {
         Size: Size,
         Object: Object,
         useCount: useCount,
-        image: image
+        image: image,
+        active: active
     });
 
     organization.roomID.push(Rooms._id.toString())
@@ -273,7 +275,7 @@ router.post('/room', upload.single('image'), async (req, res) => {
 
 router.get('/room', paginatedResults(RoomsModel), async (req, res) => {
 
-    RoomsModel.find({}, (err) => {
+    RoomsModel.find({active: true}, (err) => {
         if (err) {
             res.send(err)
         } else {
@@ -361,11 +363,13 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
 router.delete('/room/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await RoomsModel.findByIdAndRemove(id).exec()
-        res.send("itemdeleted");
+        const room = await RoomsModel.findById(id)
+        room.active = false
+        await room.save()
+        res.send("active status is false");
     }
     catch (err) {
-        console.log(err);
+        res.status(500).send(err)
     }
 
 })
@@ -373,12 +377,12 @@ router.delete('/room/:id', async (req, res) => {
 router.get('/search/:key', async (req, res) => {
 
     let result = await RoomsModel.find({
-        "$or": [
+        "$and": [
             {
                 Name: { $regex: req.params.key },
-                Contributor: { $regex: req.params.key }
+                active: true
             }
-        ]
+        ],
     })
     res.send(result);
 })
@@ -413,6 +417,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("Org.id", req.query.OrgID),
             ...addCondition("Seat", req.query.Seat, false, true),
             ...addCondition("Size", req.query.Size, true),
+            ...addCondition("active", true),
         };
 
         if (req.query.Object) {
@@ -459,7 +464,7 @@ router.get('/buildingroom/:id', async (req, res) => {
     const building = await BuildingModel.findOne({ _id: id })
 
     const rooms = building.roomID
-    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) }, active: true }).then(data => {
         res.send(data)
     })
 })
@@ -469,7 +474,7 @@ router.get('/roomtyperoom/:id', async (req, res) => {
     const roomtype = await RoomTypeModel.findOne({ _id: id })
 
     const rooms = roomtype.roomID;
-    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).then(data => {
+    RoomsModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) }, active: true }).then(data => {
         res.send(data)
     })
 })

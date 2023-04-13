@@ -8,7 +8,7 @@ const OrgModel = require('../models/Org')
 router.get('/', async (req, res) => {
 
     try {
-        RoomModel.find({}).sort({ useCount: -1 })
+        RoomModel.find({ active: true }).sort({ useCount: -1 })
             .select({
                 "Name": 1,
                 "useCount": 1
@@ -80,7 +80,7 @@ router.get('/buildingroom/:id', async (req, res) => {
     const building = await BuildingModel.findOne({ _id: id })
 
     const rooms = building.roomID
-    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
+    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) }, active:true }).sort({ useCount: -1 }).then(data => {
         res.send(data)
     })
 })
@@ -90,7 +90,7 @@ router.get('/org/room/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const rooms = org.roomID
-    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) } }).sort({ useCount: -1 }).then(data => {
+    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) }, active:true }).sort({ useCount: -1 }).then(data => {
         res.send(data)
     })
 })

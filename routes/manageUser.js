@@ -28,7 +28,8 @@ router.post('/status', async (req, res) => {
         name: name,
         // priority: priority,
         userID: userID,
-        org: org
+        org: org,
+        active: req.body.active
     });
 
     Organization.statusID.push(Status._id.toString())
@@ -43,7 +44,7 @@ router.post('/status', async (req, res) => {
 })
 
 router.get('/status', async (req, res) => {
-    StatusModel.find({}, (err, result) => {
+    StatusModel.find({ active: true }, (err, result) => {
         if (err) {
             res.send(err)
         }
@@ -57,13 +58,18 @@ router.put("/status/:id", async (req, res) => {
 
     const id = req.params.id
     const status = await StatusModel.findById(id)
+    const OrgOld = await OrgModel.findById(status.org.id)
 
-    if (req.body.org) {
-        const Organization = await OrgModel.findById(req.body.org)
+    if (req.body.org && req.body.org != status.org.id) {
+        const OrgNew = await OrgModel.findById(req.body.org)
         status.org = {
             id: req.body.org,
-            name: Organization.name
+            name: OrgNew.name
         }
+        OrgNew.statusID.push(status._id.toString())
+        await OrgNew.save()
+        OrgOld.statusID = OrgOld.statusID.filter(e => e !== status._id.toString())
+        await OrgOld.save()
     }
 
     if (req.body.name) {
@@ -82,8 +88,10 @@ router.put("/status/:id", async (req, res) => {
 router.delete('/status/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await StatusModel.findByIdAndRemove(id).exec()
-        res.send("itemdeleted");
+        const status = await StatusModel.findById(id)
+        status.active = false
+        await status.save()
+        res.send("active status is false");
     }
     catch (err) {
         console.log(err);
@@ -164,6 +172,7 @@ router.post('/', upload.single('image'), async (req, res) => {
             role: role,
             org: org,
             image: image,
+            active: req.body.active
         });
 
         const token = jwt.sign({ _id: Users._id }, process.env.TOKEN_SECRET)
@@ -184,7 +193,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    UsersModel.find({}, (err, result) => {
+    UsersModel.find({ active : true }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -290,8 +299,10 @@ router.put("/:id", upload.single('image'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await UsersModel.findByIdAndRemove(id).exec()
-        res.send("itemdeleted");
+        const user = await UsersModel.findById(id)
+        user.active = false
+        await user.save()
+        res.send("active status is false");
     }
     catch (err) {
         console.log(err);
@@ -305,6 +316,9 @@ router.get('/search/:key', async (req, res) => {
         "$or": [
             { username: { $regex: req.params.key } },
             { email: { $regex: req.params.key } },
+        ],
+        "$and": [
+            { active: true }
         ]
     })
     res.send(result);
@@ -336,6 +350,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("email", req.query.email,true),
             ...addCondition("status.id", req.query.status),
             ...addCondition("org.id", req.query.org),
+            ...addCondition("active", true)
         };
 
         const result = await UsersModel.aggregate([{ $match: match }]);
@@ -377,7 +392,7 @@ router.get('/statususer/:id', async (req, res) => {
     const status = await StatusModel.findOne({ _id: id })
 
     const users = status.userID
-    UsersModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) } }).then(data => {
+    UsersModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) }, active: true }).then(data => {
         res.send(data)
     })
 })
