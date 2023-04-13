@@ -50,7 +50,6 @@ router.post('/', async (req, res) => {
     const Date_Reserve = req.body.Date_Reserve
     const Status_Approve = req.body.Status_Approve
     const Seat = req.body.Seat
-    const Object = req.body.Object
     const Purpose = req.body.Purpose
 
     const Requests = new RequestsModel({
@@ -68,7 +67,6 @@ router.post('/', async (req, res) => {
         Date_Reserve: Date_Reserve,
         Status_Approve: Status_Approve,
         Seat: Seat,
-        Object: Object,
         Purpose: Purpose
     });
 
@@ -161,7 +159,6 @@ router.put("/:id", async (req, res) => {
                     allDay: request.allDay,
                     Status_Approve: request.Status_Approve,
                     Seat: request.Seat,
-                    Object: request.Object,
                     Purpose: request.Purpose
                 })
                 await Event.save();

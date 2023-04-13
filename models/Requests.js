@@ -22,10 +22,6 @@ const RequestSchema = new mongoose.Schema({
         username: { type: String }
 
     },
-    Object: {
-        type: [],
-        required: true,
-    },
     startTime: {
         type: Array,
         default: [Date]

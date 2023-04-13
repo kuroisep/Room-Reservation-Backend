@@ -22,10 +22,6 @@ const EventSchema = new mongoose.Schema({
         id: { type: String },
         username: { type: String }
     },
-    Object: {
-        type: [],
-        required: true,
-    },
     startTime: {
         type: Date
     },
