@@ -65,6 +65,7 @@ router.get('/searchby/', async (req, res) => {
             ...addCondition("Roomtype.id", req.query.RoomType),
             ...addCondition("Building.id", req.query.Building),
             ...addCondition("Org.id", req.query.Org),
+            ...addCondition("Status_Approve", "Approved"),
         };
 
         const result = await RequestsModel.aggregate([{ $match: match }]);

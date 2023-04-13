@@ -73,8 +73,6 @@ router.post('/', async (req, res) => {
     });
 
     try {
-        Rooms.useCount = (Rooms.useCount) + 1
-        await Rooms.save()
         await Requests.save()
         res.send('Success')
     } catch (err) {
@@ -168,8 +166,11 @@ router.put("/:id", async (req, res) => {
                 })
                 await Event.save();
 
-                const User = await UserModel.findById(request.User.id)
+               // const User = await UserModel.findById(request.User.id)
             }
+            const room = await RoomModel.findById(request.Room.id)
+            room.useCount = (room.useCount) + 1
+            await room.save()
         }
         if (req.body.Seat) {
             request.Seat = req.body.Seat
@@ -192,6 +193,14 @@ router.delete('/:id', async (req, res) => {
         request.Status_Approve = "Cancled"
         await request.save()
         res.send("Request Status is cancled");
+
+        const room = await RoomModel.findById(request.Room.id)
+        if (room.useCount > 0){
+            room.useCount = room.useCount - 1
+        }
+        else {
+            room.useCount = 0
+        }
     }
     catch (err) {
         console.log(err);
