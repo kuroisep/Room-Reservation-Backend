@@ -117,7 +117,7 @@ router.get('/user/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const users = org.userID
-    UserModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) } }).then(data => {
+    UserModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) }, active: true }).then(data => {
         res.send(data)
     })
 })
@@ -127,7 +127,7 @@ router.get('/status/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const status = org.statusID;
-    StatusModel.find({ _id: { $in: status.map((status) => new mongoose.Types.ObjectId(status)) } }).then(data => {
+    StatusModel.find({ _id: { $in: status.map((status) => new mongoose.Types.ObjectId(status)) }, active: true }).then(data => {
         res.send(data)
     })
 })
@@ -138,7 +138,7 @@ router.get('/roomtype/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const roomtype = org.roomTypeID
-    RoomTypeModel.find({ _id: { $in: roomtype.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) } }).then(data => {
+    RoomTypeModel.find({ _id: { $in: roomtype.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) }, active: true }).then(data => {
         res.send(data)
     })
 })

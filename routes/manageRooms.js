@@ -122,11 +122,13 @@ router.post('/roomtype', async (req, res) => {
         name: organization.name
     }
     const roomID = req.body.roomID
+    const active = req.body.active
 
     const RoomTypes = new RoomTypeModel({
         name: name,
         org: org,
-        roomID: roomID
+        roomID: roomID,
+        active : active
     });
 
     organization.roomTypeID.push(RoomTypes._id.toString())
@@ -168,8 +170,10 @@ router.put("/roomtype/:id", async (req, res) => {
 router.delete('/roomtype/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        await RoomTypeModel.findByIdAndRemove(id).exec()
-        res.send("itemdeleted");
+        const roomtype = await RoomTypeModel.findById(id)
+        roomtype.active = false
+        await roomtype.save()
+        res.send("active is false");
     }
     catch (err) {
         console.log(err);

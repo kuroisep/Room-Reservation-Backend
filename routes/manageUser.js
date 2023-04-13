@@ -365,6 +365,13 @@ router.get('/userprofile', (req, res) => {
     });
 })
 
+router.get('/:id', (req,res) => {
+    var userId = req.params.id;
+    UsersModel.findOne({ _id: userId }).then(function (user) {
+        res.send(user)
+    });
+})
+
 router.get('/statususer/:id', async (req, res) => {
     const id = req.params.id
     const status = await StatusModel.findOne({ _id: id })

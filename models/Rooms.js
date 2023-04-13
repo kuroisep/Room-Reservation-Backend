@@ -53,6 +53,10 @@ const RoomSchema = new mongoose.Schema({
         url: {
             type: String
         }
+    },
+    active: {
+        type: Boolean,
+        default: true
     }
 });
 
