@@ -23,7 +23,12 @@ router.post('/', async (req, res) => {
         $and: [{"Room.id": req.query.Room}],
         $or: [
             {
-                $and: [{startTime: { $lt: req.query.startTime }}, {end: { $gt: req.query.endTime }}]
+                $and: [
+                    {startTime: { $lt: req.query.startTime }}, {endTime: { $gt: req.query.endTime }},
+                    {startTime: { $gt: req.query.startTime }}, {endTime: { $lt: req.query.endTime }},
+                    {startTime: { $lt: req.query.startTime }}, {endTime: { $lt: req.query.startTime }},
+                    {startTime: { $gt: req.query.startTime }}, {endTime: { $gt: req.query.startTime }}
+                ]
             }
         ]
     })
@@ -31,62 +36,64 @@ router.post('/', async (req, res) => {
         res.status(500).send('Room is already reserved')
     }
 
-    const User = {
-        id: req.body.UserID,
-        username: userid.username
-    }
-    const Room = {
-        id: req.body.Room,
-        name: Rooms.Name
-    }
-    const RoomType = {
-        id: roomt.id,
-        name: roomt.name
-    }
-    const build = await BuildingModel.findById(Rooms.Building.id)
-    const Building = {
-        id: build.id,
-        name: build.name
-    }
-    const Org = {
-        id: Organization.id,
-        name: Organization.name
-    }
-
-    const startTime = req.body.startTime
-    const endTime = req.body.endTime
-    const repeatDate = req.body.repeatDate
-    const recurrance = req.body.recurrance
-    const endDate = req.body.endDate
-    const allDay = req.body.allDay
-    const Date_Reserve = req.body.Date_Reserve
-    const Status_Approve = req.body.Status_Approve
-    const Seat = req.body.Seat
-    const Purpose = req.body.Purpose
-
-    const Requests = new RequestsModel({
-        Room: Room,
-        RoomType: RoomType,
-        Building: Building,
-        User: User,
-        Org: Org,
-        startTime: startTime,
-        endTime: endTime,
-        repeatDate: repeatDate,
-        recurrance: recurrance,
-        endDate: endDate,
-        allDay: allDay,
-        Date_Reserve: Date_Reserve,
-        Status_Approve: Status_Approve,
-        Seat: Seat,
-        Purpose: Purpose
-    });
-
-    try {
-        await Requests.save()
-        res.send('Success')
-    } catch (err) {
-        res.status(400).send(err);
+    else {
+        const User = {
+            id: req.body.UserID,
+            username: userid.username
+        }
+        const Room = {
+            id: req.body.Room,
+            name: Rooms.Name
+        }
+        const RoomType = {
+            id: roomt.id,
+            name: roomt.name
+        }
+        const build = await BuildingModel.findById(Rooms.Building.id)
+        const Building = {
+            id: build.id,
+            name: build.name
+        }
+        const Org = {
+            id: Organization.id,
+            name: Organization.name
+        }
+    
+        const startTime = req.body.startTime
+        const endTime = req.body.endTime
+        const repeatDate = req.body.repeatDate
+        const recurrance = req.body.recurrance
+        const endDate = req.body.endDate
+        const allDay = req.body.allDay
+        const Date_Reserve = req.body.Date_Reserve
+        const Status_Approve = req.body.Status_Approve
+        const Seat = req.body.Seat
+        const Purpose = req.body.Purpose
+    
+        const Requests = new RequestsModel({
+            Room: Room,
+            RoomType: RoomType,
+            Building: Building,
+            User: User,
+            Org: Org,
+            startTime: startTime,
+            endTime: endTime,
+            repeatDate: repeatDate,
+            recurrance: recurrance,
+            endDate: endDate,
+            allDay: allDay,
+            Date_Reserve: Date_Reserve,
+            Status_Approve: Status_Approve,
+            Seat: Seat,
+            Purpose: Purpose
+        });
+    
+        try {
+            await Requests.save()
+            res.send('Success')
+        } catch (err) {
+            res.status(400).send(err);
+        }
     }
 })
 
