@@ -18,22 +18,26 @@ router.post('/', async (req, res) => {
     const Organization = await OrgModel.findById(userid.org.id)
     // const Organization = await OrgModel.findOne({ name: User.org })
     const roomt = await RoomTypeModel.findById(Rooms.RoomType.id)
-    let timeoverlap = []
-    timeoverlap = await EventModel.find({
-        $and: [{"Room.id": req.query.Room}],
-        $or: [
-            {
-                $and: [
-                    {startTime: { $lt: req.query.startTime }}, {endTime: { $gt: req.query.endTime }},
-                    {startTime: { $gt: req.query.startTime }}, {endTime: { $lt: req.query.endTime }},
-                    {startTime: { $lt: req.query.startTime }}, {endTime: { $lt: req.query.startTime }},
-                    {startTime: { $gt: req.query.startTime }}, {endTime: { $gt: req.query.startTime }}
-                ]
-            }
-        ]
-    })
-  //  console.log(timeoverlap)
-    if (timeoverlap != ''){
+    
+    const start = req.body.startTime
+    const end = req.body.endTime
+    let timeoverlap;
+
+    for(let i=0; i<start.length; i++){
+        
+        timeoverlap = await EventModel.find({ 
+            "$and": [{ "Room.id": req.body.Room }],
+            "$or": [ 
+                {"$and": [{ startTime: { $lte: start[i][0] }}, { endTime: { $gte: end[i][0] }}]},
+                {"$and": [{ startTime: { $gte: start[i][0] }}, { endTime: { $lte: end[i][0] }}]},
+                {"$and": [{ startTime: { $gte: start[i][0] }}, {endTime: { $lte: end[i][0] }}]},
+                {"$and": [{ endTime: { $gte: end[i][0] }}, {endTime: { $lte: end [i][0]}}]}  
+            ]
+        })
+    }
+    
+    console.log(timeoverlap)
+    if (timeoverlap.length>0){
         res.status(500).send('Room is already reserved')
     }
 
@@ -194,7 +198,7 @@ router.put("/:id", async (req, res) => {
         }
 
         try {
-            request.save()
+            await request.save()
             res.send('updated');
 
         } catch (err) {
