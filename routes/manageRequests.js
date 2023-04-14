@@ -18,6 +18,18 @@ router.post('/', async (req, res) => {
     const Organization = await OrgModel.findById(userid.org.id)
     // const Organization = await OrgModel.findOne({ name: User.org })
     const roomt = await RoomTypeModel.findById(Rooms.RoomType.id)
+    let timeoverlap
+    timeoverlap = EventModel.find({
+        $and: [{"Room.id": req.query.Room}],
+        $or: [
+            {
+                $and: [{startTime: { $lt: req.query.startTime }}, {end: { $gt: req.query.endTime }}]
+            }
+        ]
+    })
+    if (timeoverlap){
+        res.status(500).send('Room is already reserved')
+    }
 
     const User = {
         id: req.body.UserID,
