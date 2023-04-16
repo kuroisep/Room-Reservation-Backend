@@ -61,7 +61,7 @@ router.put("/:id", async (req, res) => {
     }
 
     try {
-        org.save();
+        await org.save();
         res.send("updated");
 
     } catch (err) {
