@@ -1,9 +1,10 @@
-const { application } = require('express');
+const { application, request } = require('express');
 const express = require('express');
 const router = express.Router();
 const RequestsModel = require('../models/Requests')
 const RoomModel = require('../models/Rooms')
 const OrgModel = require('../models/Org')
+const EventModel = require('../models/Event')
 
 router.get('/', async (req, res) => {
 
@@ -91,6 +92,26 @@ router.get('/org/:id', async (req, res) => {
     RequestsModel.find({ "Org.id":orgid, Status_Approve: "Approved" } ).sort({ "Room.id": -1 }).then(data => {
         res.send(data)
     });
+})
+
+router.post('/searchbydate', async (req, res) => {
+
+    const start = new Date(req.body.startTime)
+    const end = req.body.endTime
+    let timeoverlap
+
+    timeoverlap = await EventModel.find(
+        {
+         "$or": [
+             //{"$and": [{ startTime: { $lte: start }}, { endTime: { $gte: end }}]},
+             {"$and": [{ startTime: { $gte: start }}, { endTime: { $lte: end }}]},
+           //  {"$and": [{ startTime: { $gte: start }}, {endTime: { $lte: end }}]},
+           //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}  
+         ] 
+        }
+     )
+    
+    res.send(timeoverlap)  
 })
 
 module.exports = router

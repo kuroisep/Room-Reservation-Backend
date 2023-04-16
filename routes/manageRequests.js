@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
             "$or": [ 
                 {"$and": [{ startTime: { $lte: start[i][0] }}, { endTime: { $gte: end[i][0] }}]},
                 {"$and": [{ startTime: { $gte: start[i][0] }}, { endTime: { $lte: end[i][0] }}]},
-                {"$and": [{ startTime: { $gte: start[i][0] }}, {endTime: { $lte: end[i][0] }}]},
+                {"$and": [{ startTime: { $gte: start[i][0] }}, { startTime: { $lte: end[i][0] }}]},
                 {"$and": [{ endTime: { $gte: end[i][0] }}, {endTime: { $lte: end [i][0]}}]}  
             ]
         })
