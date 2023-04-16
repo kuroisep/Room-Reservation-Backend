@@ -102,12 +102,12 @@ router.post('/searchbydate', async (req, res) => {
 
     timeoverlap = await EventModel.find(
         {
-         "$or": [
+         
              //{"$and": [{ startTime: { $lte: start }}, { endTime: { $gte: end }}]},
-             {"$and": [{ startTime: { $gte: start }}, { endTime: { $lte: end }}]},
+            "$and": [{ startTime: { $gte: start }}, { endTime: { $lte: end }}]
            //  {"$and": [{ startTime: { $gte: start }}, {endTime: { $lte: end }}]},
            //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}  
-         ] 
+         
         }
      )
     
