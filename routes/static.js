@@ -41,6 +41,25 @@ router.get('/search/:key', async (req, res) => {
 })
 
 router.get('/searchby/', async (req, res) => {
+    let limit = 10;
+    if (req.query.limit) {
+        try {
+            limit = Number.parseInt(req.query.limit);
+        } catch (err) {}
+
+        if (limit > 100) {
+            limit = 100;
+        }
+        if (limit < 1) {
+            limit = 1;
+        }
+    }
+
+    let showUseMinute = false;
+    if (req.query.showUseMinute) {
+        showUseMinute = true;
+    }
+
     try {
         const addCondition = (key, value, caseSensitive, number) => {
             let ret = {};
@@ -62,15 +81,74 @@ router.get('/searchby/', async (req, res) => {
         }
 
         let match = {
-            ...addCondition("Room.id", req.query.Room),
-            ...addCondition("Roomtype.id", req.query.RoomType),
-            ...addCondition("Building.id", req.query.Building),
-            ...addCondition("Org.id", req.query.Org),
+            ...addCondition("Room.id", req.query.RoomID),
+            ...addCondition("Roomtype.id", req.query.RoomTypeID),
+            ...addCondition("Building.id", req.query.BuildingID),
+            ...addCondition("Org.id", req.query.OrgID),
+            ...addCondition("User.id", req.query.UserID),
             ...addCondition("Status_Approve", "Approved"),
         };
-        
-        const result = await RequestsModel.aggregate([{ $match: match }]);
 
+        let matchStartTime = {};
+        if (req.query.fromTime) {
+            matchStartTime["$gte"] = new Date(req.query.fromTime);
+        }
+        if (req.query.toTime) {
+            matchStartTime["$lt"] = new Date(req.query.toTime);
+        }
+        if (Object.keys(matchStartTime).length !== 0) {
+            match = {
+                ...match,
+                startTime: matchStartTime
+            }
+        }
+
+        let group = {
+            _id: "$Room.id",
+            Name: {
+                $first: "$Room.name",
+            },
+            useCount: {
+                $sum: 1,
+            },
+        }
+
+        let aggregate = EventModel.aggregate();
+        aggregate = aggregate.match(match);
+        console.log(match)
+        if (showUseMinute) {
+            aggregate = aggregate.addFields({
+                startTimestamp: { $toDecimal: "$startTime" },
+                endTimestamp: { $toDecimal: "$endTime" }
+            });
+            aggregate = aggregate.addFields({
+                UseMinute: {
+                    $divide: [
+                        { $subtract: [ "$endTimestamp", "$startTimestamp" ] },
+                        60 * 1000,
+                    ],
+                },
+            });
+
+            group = {
+                ...group,
+                UseMinute: { $sum: "$UseMinute" },
+            }
+        }
+        aggregate = aggregate.group(group);
+        aggregate = aggregate.sort({ useCount: -1 });
+        aggregate = aggregate.limit(limit);
+
+        let result = await aggregate.exec()
+        if (showUseMinute) {
+            // Convert Mongo Decimal128 to Number
+            result = result.map(row => {
+                return {
+                    ...row,
+                    UseMinute: Number.parseInt(row.UseMinute.toString())
+                }
+            });
+        }
         res.send(result)
     } catch (err) {
         res.status(500).send(err);
@@ -102,16 +180,16 @@ router.post('/searchbydate', async (req, res) => {
 
     timeoverlap = await EventModel.find(
         {
-         
+
              //{"$and": [{ startTime: { $lte: start }}, { endTime: { $gte: end }}]},
             "$and": [{ startTime: { $gte: start }}, { endTime: { $lte: end }}]
            //  {"$and": [{ startTime: { $gte: start }}, {endTime: { $lte: end }}]},
-           //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}  
-         
+           //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}
+
         }
      )
-    
-    res.send(timeoverlap)  
+
+    res.send(timeoverlap)
 })
 
 module.exports = router
