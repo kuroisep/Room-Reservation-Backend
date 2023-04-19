@@ -113,15 +113,14 @@ router.get('/searchby/', async (req, res) => {
             },
         }
 
-        let aggregate = EventModel.aggregate();
-        aggregate = aggregate.match(match);
-        console.log(match)
+        const aggregate = EventModel.aggregate();
+        aggregate.match(match);
         if (showUseMinute) {
-            aggregate = aggregate.addFields({
+            aggregate.addFields({
                 startTimestamp: { $toDecimal: "$startTime" },
                 endTimestamp: { $toDecimal: "$endTime" }
             });
-            aggregate = aggregate.addFields({
+            aggregate.addFields({
                 UseMinute: {
                     $divide: [
                         { $subtract: [ "$endTimestamp", "$startTimestamp" ] },
@@ -135,9 +134,9 @@ router.get('/searchby/', async (req, res) => {
                 UseMinute: { $sum: "$UseMinute" },
             }
         }
-        aggregate = aggregate.group(group);
-        aggregate = aggregate.sort({ useCount: -1 });
-        aggregate = aggregate.limit(limit);
+        aggregate.group(group);
+        aggregate.sort({ useCount: -1 });
+        aggregate.limit(limit);
 
         let result = await aggregate.exec()
         if (showUseMinute) {

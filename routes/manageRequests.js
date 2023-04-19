@@ -18,24 +18,24 @@ router.post('/', async (req, res) => {
     const Organization = await OrgModel.findById(userid.org.id)
     // const Organization = await OrgModel.findOne({ name: User.org })
     const roomt = await RoomTypeModel.findById(Rooms.RoomType.id)
-    
+
     const start = req.body.startTime
     const end = req.body.endTime
     let timeoverlap;
 
     for(let i=0; i<start.length; i++){
-        
-        timeoverlap = await EventModel.find({ 
+
+        timeoverlap = await EventModel.find({
             "$and": [{ "Room.id": req.body.Room }],
-            "$or": [ 
+            "$or": [
                 {"$and": [{ startTime: { $lte: start[i][0] }}, { endTime: { $gte: end[i][0] }}]},
                 {"$and": [{ startTime: { $gte: start[i][0] }}, { endTime: { $lte: end[i][0] }}]},
                 {"$and": [{ startTime: { $gte: start[i][0] }}, { startTime: { $lte: end[i][0] }}]},
-                {"$and": [{ endTime: { $gte: end[i][0] }}, {endTime: { $lte: end [i][0]}}]}  
+                {"$and": [{ endTime: { $gte: end[i][0] }}, {endTime: { $lte: end [i][0]}}]}
             ]
         })
     }
-    
+
     console.log(timeoverlap)
     if (timeoverlap.length>0){
         res.status(500).send('Room is already reserved')
@@ -63,7 +63,7 @@ router.post('/', async (req, res) => {
             id: Organization.id,
             name: Organization.name
         }
-    
+
         const startTime = req.body.startTime
         const endTime = req.body.endTime
         const repeatDate = req.body.repeatDate
@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
         const Status_Approve = req.body.Status_Approve
         const Seat = req.body.Seat
         const Purpose = req.body.Purpose
-    
+
         const Requests = new RequestsModel({
             Room: Room,
             RoomType: RoomType,
@@ -92,7 +92,7 @@ router.post('/', async (req, res) => {
             Seat: Seat,
             Purpose: Purpose
         });
-    
+
         try {
             await Requests.save()
             res.send('Success')
@@ -255,15 +255,65 @@ router.get('/searchby/', async (req, res) => {
             return ret;
         }
 
+        const aggregate = RequestsModel.aggregate();
+
+        if (req.query.ContributorID) {
+            // Join rooms by room.id
+            // to get Contributor id
+            aggregate.lookup({
+                from: "rooms",
+                let: { roomId: "$Room.id" },
+                pipeline: [
+                    {
+                        $addFields: {
+                            roomId: { $toObjectId: "$$roomId" },
+
+                            // to output same as normal
+                            id: "$_id",
+                            name: "$Name",
+                        },
+                    },
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", "$roomId"],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            id: 1,
+                            name: 1,
+                            "Contributor.id": 1,
+                        },
+                    },
+                ],
+                as: "Room",
+            });
+
+            aggregate.unwind("$Room");
+        }
+
         let match = {
             ...addCondition("Status_Approve", req.query.Status_Approve),
             ...addCondition("User.id", req.query.UserID),
             ...addCondition("Room.id", req.query.RoomID),
             ...addCondition("Building.id", req.query.BuildingID),
-            ...addCondition("Org.id", req.query.Org),
+            ...addCondition("Org.id", req.query.OrgID),
+            ...addCondition("Room.Contributor.id", req.query.ContributorID),
         };
 
-        const result = await RequestsModel.aggregate([{ $match: match }]);
+        aggregate.match(match);
+
+        if (req.query.ContributorID) {
+            // Not show Contributor id
+            aggregate.project({
+                "Room.Contributor": 0
+            })
+        }
+
+        const result = await aggregate.exec();
 
         res.send(result)
     } catch (err) {
