@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
     const User = await UserModel.findById(userId)
 
     org = await OrgModel.findById(User.org.id);
-  
+
     EventModel.find({ "Org.id":org._id } ).then(data => {
         res.send(data)
     });
