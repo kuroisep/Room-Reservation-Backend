@@ -417,6 +417,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("Org.id", req.query.OrgID),
             ...addCondition("Seat", req.query.Seat, false, true),
             ...addCondition("Size", req.query.Size, true),
+            ...addCondition("Object", req.query.Object, true),
             ...addCondition("active", true),
         };
 
