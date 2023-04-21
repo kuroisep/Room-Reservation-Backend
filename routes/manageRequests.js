@@ -262,29 +262,22 @@ router.get('/searchby/', async (req, res) => {
             // to get Contributor id
             aggregate.lookup({
                 from: "rooms",
-                let: { roomId: "$Room.id" },
+                let: { roomId: { $toObjectId: "$Room.id" } },
                 pipeline: [
-                    {
-                        $addFields: {
-                            roomId: { $toObjectId: "$$roomId" },
-
-                            // to output same as normal
-                            id: "$_id",
-                            name: "$Name",
-                        },
-                    },
                     {
                         $match: {
                             $expr: {
-                                $eq: ["$_id", "$roomId"],
+                                $eq: ["$_id", "$$roomId"],
                             },
                         },
                     },
                     {
                         $project: {
+                            // to output same as normal
                             _id: 0,
-                            id: 1,
-                            name: 1,
+                            id: "$_id",
+                            name: "$Name",
+
                             "Contributor.id": 1,
                         },
                     },
@@ -320,6 +313,128 @@ router.get('/searchby/', async (req, res) => {
         res.status(500).send(err);
     }
 })
+
+
+router.get('/stat', async (req, res) => {
+    try {
+        const addCondition = (key, value) => {
+            let ret = {};
+            if (value) {
+                if (Array.isArray(value)) {
+                    ret[key] = { $in: value };
+                } else {
+                    ret[key] = value;
+                }
+            }
+            return ret;
+        }
+
+        const aggregate = RequestsModel.aggregate();
+
+        if (req.query.ContributorID) {
+            // Join rooms by room.id
+            // to get Contributor id
+            aggregate.lookup({
+                from: "rooms",
+                let: { roomId: { $toObjectId: "$Room.id" } },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", "$$roomId"],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            // to output same as normal
+                            _id: 0,
+                            id: "$_id",
+                            name: "$Name",
+
+                            "Contributor.id": 1,
+                        },
+                    },
+                ],
+                as: "Room",
+            });
+
+            aggregate.unwind("$Room");
+        }
+
+        let match = {
+            ...addCondition("Status_Approve", req.query.Status_Approve),
+            ...addCondition("User.id", req.query.UserID),
+            ...addCondition("Room.id", req.query.RoomID),
+            ...addCondition("Building.id", req.query.BuildingID),
+            ...addCondition("Org.id", req.query.OrgID),
+            ...addCondition("Room.Contributor.id", req.query.ContributorID),
+        };
+
+        let matchStartTime = {};
+        if (req.query.fromTime) {
+            matchStartTime["$gte"] = new Date(req.query.fromTime);
+        }
+        if (req.query.toTime) {
+            matchStartTime["$lt"] = new Date(req.query.toTime);
+        }
+        if (Object.keys(matchStartTime).length !== 0) {
+            aggregate.unwind("$startTime");
+            aggregate.unwind("$startTime");
+            aggregate.addFields({
+                startTime: {
+                    $dateFromString: {
+                        dateString: "$startTime",
+                    },
+                },
+            });
+
+            match = {
+                ...match,
+                startTime: matchStartTime
+            }
+        }
+
+        aggregate.match(match);
+
+        if (req.query.ContributorID) {
+            // Not show Contributor id
+            aggregate.project({
+                "Room.Contributor": 0
+            })
+        }
+
+        aggregate.group({
+            _id: "$_id",
+            Status_Approve: {
+                $first: "$Status_Approve",
+            },
+        })
+
+        aggregate.group({
+            _id: "$Status_Approve",
+            count: {
+                $count: {},
+            },
+        })
+
+        const result = await aggregate.exec();
+        let output = {
+            Approved: 0,
+            Cancled: 0,
+            Pending: 0,
+            Rejected: 0,
+        };
+        result.forEach((value) => {
+            output[value._id] = value.count;
+        })
+
+        res.send(output);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+})
+
 
 router.get('/history', async (req, res) => {
     if (req.headers && req.headers.authorization) {
