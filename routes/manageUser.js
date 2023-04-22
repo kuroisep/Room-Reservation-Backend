@@ -283,7 +283,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
             }
         })
     }
-    
+
     try {
         await user.save()
         await OrgOld?.save()

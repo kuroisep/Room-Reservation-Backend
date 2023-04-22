@@ -61,6 +61,20 @@ router.get('/searchby/', async (req, res) => {
             ...addCondition("Org.id", req.query.Org),
         };
 
+        let matchStartTime = {};
+        if (req.query.fromTime) {
+            matchStartTime["$gte"] = new Date(req.query.fromTime);
+        }
+        if (req.query.toTime) {
+            matchStartTime["$lt"] = new Date(req.query.toTime);
+        }
+        if (Object.keys(matchStartTime).length !== 0) {
+            match = {
+                ...match,
+                startTime: matchStartTime
+            }
+        }
+
         const result = await EventModel.aggregate([{ $match: match }]);
 
         res.send(result)
