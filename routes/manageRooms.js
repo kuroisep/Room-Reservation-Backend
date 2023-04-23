@@ -70,7 +70,7 @@ router.post('/building', async (req, res) => {
 
 
 router.get('/building', async (req, res) => {
-    BuildingModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
+    BuildingModel.find({ active: { $ne: false } }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -138,7 +138,7 @@ router.post('/roomtype', async (req, res) => {
 
 
 router.get('/roomtype', async (req, res) => {
-    RoomTypeModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
+    RoomTypeModel.find({ active: { $ne: false } }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -272,7 +272,7 @@ router.post('/room', upload.single('image'), async (req, res) => {
 
 router.get('/room', paginatedResults(RoomsModel), async (req, res) => {
 
-    RoomsModel.find({ $expr: { $ne: ['$active', false] } }, (err) => {
+    RoomsModel.find({ active: { $ne: false } }, (err) => {
         if (err) {
             res.send(err)
         } else {
@@ -375,7 +375,7 @@ router.get('/search/:key', async (req, res) => {
 
     let result = await RoomsModel.find({
         Name: { $regex: req.params.key },
-        $expr: { $ne: ['$active', false] },
+        active: { $ne: false },
     })
     res.send(result);
 })
@@ -411,7 +411,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("Seat", req.query.Seat, false, true),
             ...addCondition("Size", req.query.Size, true),
             ...addCondition("Object", req.query.Object, true),
-            ...{ $expr: { $ne: ['$active', false] } },
+            ...{ active: { $ne: false } },
         };
 
         if (req.query.Object) {
@@ -460,7 +460,7 @@ router.get('/buildingroom/:id', async (req, res) => {
     const rooms = building.roomID
     RoomsModel.find({
         _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) },
-        $expr: { $ne: ['$active', false] }
+        active: { $ne: false }
     }).then(data => {
         res.send(data)
     })
@@ -473,7 +473,7 @@ router.get('/roomtyperoom/:id', async (req, res) => {
     const rooms = roomtype.roomID;
     RoomsModel.find({
         _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) },
-        $expr: { $ne: ['$active', false] },
+        active: { $ne: false },
     }).then(data => {
         res.send(data)
     })

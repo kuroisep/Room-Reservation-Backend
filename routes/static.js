@@ -9,7 +9,7 @@ const EventModel = require('../models/Event')
 router.get('/', async (req, res) => {
 
     try {
-        RoomModel.find({ $expr: { $ne: ['$active', false] } }).sort({ useCount: -1 })
+        RoomModel.find({ active: { $ne: false } }).sort({ useCount: -1 })
             .select({
                 "Name": 1,
                 "useCount": 1
@@ -159,7 +159,7 @@ router.get('/buildingroom/:id', async (req, res) => {
 
     const result = await RoomModel.find({
         "Org.id": OrgID,
-        $expr: { $ne: ['$active', false] },
+        active: { $ne: false },
     }).sort({ useCount: -1 })
 
     res.send(result);

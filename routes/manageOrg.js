@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    OrgModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
+    OrgModel.find({ active: { $ne: false } }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -106,7 +106,7 @@ router.get('/building/:id', async (req, res) => {
 
     const result = await BuildingModel.find({
         "org.id": OrgID,
-        $expr: { $ne: ['$active', false] }
+        active: { $ne: false }
     })
 
     res.send(result);

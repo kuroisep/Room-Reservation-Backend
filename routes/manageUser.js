@@ -44,7 +44,7 @@ router.post('/status', async (req, res) => {
 })
 
 router.get('/status', async (req, res) => {
-    StatusModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
+    StatusModel.find({ active: { $ne: false } }, (err, result) => {
         if (err) {
             res.send(err)
         }
@@ -193,7 +193,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    UsersModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
+    UsersModel.find({ active: { $ne: false } }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -317,7 +317,7 @@ router.get('/search/:key', async (req, res) => {
             { username: { $regex: req.params.key } },
             { email: { $regex: req.params.key } },
         ],
-        $expr: { $ne: ['$active', false] }
+        active: { $ne: false }
     })
     res.send(result);
 })
@@ -348,7 +348,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("email", req.query.email, true),
             ...addCondition("status.id", req.query.status),
             ...addCondition("org.id", req.query.org),
-            ...{ $expr: { $ne: ['$active', false] } },
+            ...{ active: { $ne: false } },
         };
 
         const result = await UsersModel.aggregate([{ $match: match }]);
@@ -392,7 +392,7 @@ router.get('/statususer/:id', async (req, res) => {
     const users = status.userID
     UsersModel.find({
         _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) },
-        $expr: { $ne: ['$active', false] },
+        active: { $ne: false },
     }).then(data => {
         res.send(data)
     })
