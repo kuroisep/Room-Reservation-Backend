@@ -143,4 +143,65 @@ router.get('/roomtype/:id', async (req, res) => {
     })
 })
 
+router.get('/stat', async (req, res) => {
+    const lookup = (collection, orgPath) => [
+        {
+            $lookup: {
+                from: `${collection}`,
+                let: { 'orgID': '$_id' },
+                pipeline: [
+                    {
+                        $match: {
+                            active: { $ne: false },
+                            $expr: {
+                                $eq: [
+                                    { $toObjectId: `$${orgPath}`, },
+                                    "$$orgID",
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            '_id': '_',
+                            'active': {
+                                $sum: {
+                                    $cond: [{ $eq: ['$active', false] }, 0, 1]
+                                }
+                            }
+                        }
+                    },
+                ],
+                as: `${collection}`,
+            }
+        },
+        {
+            $set: {
+                [collection]: {
+                    $arrayElemAt: [`$${collection}.active`, 0],
+                },
+            }
+        },
+    ]
+
+    const pipeline = [
+        {
+            $match: { active: { $ne: false } }
+        },
+        {
+            $project: {
+                '_id': 1,
+                'name': 1
+            }
+        },
+        ...lookup("buildings", "org.id"),
+        ...lookup("rooms", "Org.id"),
+        ...lookup("users", "org.id"),
+    ]
+
+    const result = await OrgModel.aggregate(pipeline).exec();
+
+    res.send(result);
+})
+
 module.exports = router
