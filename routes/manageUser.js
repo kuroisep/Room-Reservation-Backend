@@ -29,7 +29,7 @@ router.post('/status', async (req, res) => {
         // priority: priority,
         userID: userID,
         org: org,
-        active: req.body.active
+        active: true
     });
 
     Organization.statusID.push(Status._id.toString())
@@ -44,7 +44,7 @@ router.post('/status', async (req, res) => {
 })
 
 router.get('/status', async (req, res) => {
-    StatusModel.find({ active: true }, (err, result) => {
+    StatusModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
         if (err) {
             res.send(err)
         }
@@ -172,7 +172,7 @@ router.post('/', upload.single('image'), async (req, res) => {
             role: role,
             org: org,
             image: image,
-            active: req.body.active
+            active: true
         });
 
         const token = jwt.sign({ _id: Users._id }, process.env.TOKEN_SECRET)
@@ -193,7 +193,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    UsersModel.find({ active : true }, (err, result) => {
+    UsersModel.find({ $expr: { $ne: ['$active', false] } }, (err, result) => {
         if (err) {
             res.send(err)
         } else {
@@ -209,23 +209,23 @@ router.put("/:id", upload.single('image'), async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
 
-    if(req.body.username){
+    if (req.body.username) {
         const newusername = req.body.username
         user.username = newusername
     }
-    if(req.body.password){
+    if (req.body.password) {
         const newpassword = await bcrypt.hash(req.body.password, salt);
         user.password = newpassword
     }
-    if(req.body.firstname){
+    if (req.body.firstname) {
         const newfirstname = req.body.firstname
         user.firstname = newfirstname
     }
-    if(req.body.lastname){
+    if (req.body.lastname) {
         const newlastname = req.body.lastname
         user.lastname = newlastname
     }
-    if(req.body.email){
+    if (req.body.email) {
         const newemail = req.body.email
         user.email = newemail
     }
@@ -235,7 +235,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
     let OrgNew
     let StatusNew
 
-    if (req.body.status && req.body.status != user.status.id){
+    if (req.body.status && req.body.status != user.status.id) {
 
         StatusOld = await StatusModel.findById(user.status.id)
         StatusOld.userID = StatusOld.userID.filter(e => e !== user._id.toString())
@@ -254,7 +254,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
             name: OrgNew.name
         }
     }
-    if(req.body.org && req.body.org !== user.org.id){
+    if (req.body.org && req.body.org !== user.org.id) {
 
         OrgOld = await OrgModel.findById(user.org.id)
         OrgOld.userID = OrgOld.userID.filter(e => e !== user._id.toString())
@@ -265,7 +265,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
             name: OrgNew.name
         }
     }
-    if(req.body.role){
+    if (req.body.role) {
         const newrole = req.body.role
         user.role = newrole
     }
@@ -313,13 +313,11 @@ router.delete('/:id', async (req, res) => {
 router.get('/search/:key', async (req, res) => {
 
     let result = await UsersModel.find({
-        "$or": [
+        $or: [
             { username: { $regex: req.params.key } },
             { email: { $regex: req.params.key } },
         ],
-        "$and": [
-            { active: true }
-        ]
+        $expr: { $ne: ['$active', false] }
     })
     res.send(result);
 })
@@ -347,10 +345,10 @@ router.get('/searchby', async (req, res) => {
 
         let match = {
             ...addCondition("role", req.query.role),
-            ...addCondition("email", req.query.email,true),
+            ...addCondition("email", req.query.email, true),
             ...addCondition("status.id", req.query.status),
             ...addCondition("org.id", req.query.org),
-            ...addCondition("active", true)
+            ...{ $expr: { $ne: ['$active', false] } },
         };
 
         const result = await UsersModel.aggregate([{ $match: match }]);
@@ -380,7 +378,7 @@ router.get('/userprofile', (req, res) => {
     });
 })
 
-router.get('/:id', (req,res) => {
+router.get('/:id', (req, res) => {
     var userId = req.params.id;
     UsersModel.findOne({ _id: userId }).then(function (user) {
         res.send(user)
@@ -392,7 +390,10 @@ router.get('/statususer/:id', async (req, res) => {
     const status = await StatusModel.findOne({ _id: id })
 
     const users = status.userID
-    UsersModel.find({ _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) }, active: true }).then(data => {
+    UsersModel.find({
+        _id: { $in: users.map((users) => new mongoose.Types.ObjectId(users)) },
+        $expr: { $ne: ['$active', false] },
+    }).then(data => {
         res.send(data)
     })
 })

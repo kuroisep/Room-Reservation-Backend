@@ -9,7 +9,7 @@ const EventModel = require('../models/Event')
 router.get('/', async (req, res) => {
 
     try {
-        RoomModel.find({ active: true }).sort({ useCount: -1 })
+        RoomModel.find({ $expr: { $ne: ['$active', false] } }).sort({ useCount: -1 })
             .select({
                 "Name": 1,
                 "useCount": 1
@@ -45,7 +45,7 @@ router.get('/searchby/', async (req, res) => {
     if (req.query.limit) {
         try {
             limit = Number.parseInt(req.query.limit);
-        } catch (err) {}
+        } catch (err) { }
 
         if (limit > 100) {
             limit = 100;
@@ -123,7 +123,7 @@ router.get('/searchby/', async (req, res) => {
             aggregate.addFields({
                 UseMinute: {
                     $divide: [
-                        { $subtract: [ "$endTimestamp", "$startTimestamp" ] },
+                        { $subtract: ["$endTimestamp", "$startTimestamp"] },
                         60 * 1000,
                     ],
                 },
@@ -155,18 +155,19 @@ router.get('/searchby/', async (req, res) => {
 })
 
 router.get('/buildingroom/:id', async (req, res) => {
-    const id = req.params.id
-    const building = await BuildingModel.findOne({ _id: id })
+    const OrgID = req.params.id
 
-    const rooms = building.roomID
-    RoomModel.find({ _id: { $in: rooms.map((rooms) => new mongoose.Types.ObjectId(rooms)) }, active:true }).sort({ useCount: -1 }).then(data => {
-        res.send(data)
-    })
+    const result = await RoomModel.find({
+        "Org.id": OrgID,
+        $expr: { $ne: ['$active', false] },
+    }).sort({ useCount: -1 })
+
+    res.send(result);
 })
 
 router.get('/org/:id', async (req, res) => {
     const orgid = req.params.id
-    RequestsModel.find({ "Org.id":orgid, Status_Approve: "Approved" } ).sort({ "Room.id": -1 }).then(data => {
+    RequestsModel.find({ "Org.id": orgid, Status_Approve: "Approved" }).sort({ "Room.id": -1 }).then(data => {
         res.send(data)
     });
 })
@@ -180,13 +181,13 @@ router.post('/searchbydate', async (req, res) => {
     timeoverlap = await EventModel.find(
         {
 
-             //{"$and": [{ startTime: { $lte: start }}, { endTime: { $gte: end }}]},
-            "$and": [{ startTime: { $gte: start }}, { endTime: { $lte: end }}]
-           //  {"$and": [{ startTime: { $gte: start }}, {endTime: { $lte: end }}]},
-           //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}
+            //{"$and": [{ startTime: { $lte: start }}, { endTime: { $gte: end }}]},
+            "$and": [{ startTime: { $gte: start } }, { endTime: { $lte: end } }]
+            //  {"$and": [{ startTime: { $gte: start }}, {endTime: { $lte: end }}]},
+            //  {"$and": [{ endTime: { $gte: end }}, {endTime: { $lte: end }}]}
 
         }
-     )
+    )
 
     res.send(timeoverlap)
 })
