@@ -178,7 +178,10 @@ router.get('/stat', async (req, res) => {
         {
             $set: {
                 [collection]: {
-                    $arrayElemAt: [`$${collection}.active`, 0],
+                    $ifNull: [
+                        { $arrayElemAt: [`$${collection}.active`, 0] },
+                        0
+                    ]
                 },
             }
         },
