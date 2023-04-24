@@ -412,12 +412,17 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("Org.id", req.query.OrgID),
             ...addCondition("Seat", req.query.Seat, false, true), //greater than
             ...addCondition("Size", req.query.Size, true),
-            ...addCondition("Object", req.query.Object, true),
             ...{ active: { $ne: false } },
         };
 
         if (req.query.Object) {
-            match.Object = new RegExp(req.query.Object, "i")
+            if (Array.isArray(req.query.Object)) {
+                match.Object = {
+                    $all: req.query.Object
+                }
+            } else {
+                match.Object = req.query.Object;
+            }
         }
 
         const result = await RoomsModel.aggregate([{ $match: match }]);
