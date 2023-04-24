@@ -410,7 +410,7 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("RoomType.id", req.query.RoomTypeID),
             ...addCondition("Building.id", req.query.BuildingID),
             ...addCondition("Org.id", req.query.OrgID),
-            ...addCondition("Seat", req.query.Seat, false, true),
+            ...addCondition("Seat", req.query.Seat, false, true), //greater than
             ...addCondition("Size", req.query.Size, true),
             ...addCondition("Object", req.query.Object, true),
             ...{ active: { $ne: false } },

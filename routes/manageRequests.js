@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
     const userid = await UserModel.findById(req.body.UserID)
     const Rooms = await RoomModel.findById(req.body.Room)
 
-    const Organization = await OrgModel.findById(userid.org.id)
+    const Organization = await OrgModel.findById(Rooms.Org.id)
     // const Organization = await OrgModel.findOne({ name: User.org })
     const roomt = await RoomTypeModel.findById(Rooms.RoomType.id)
 
