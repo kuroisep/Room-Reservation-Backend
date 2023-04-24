@@ -410,10 +410,15 @@ router.get('/searchby', async (req, res) => {
             ...addCondition("RoomType.id", req.query.RoomTypeID),
             ...addCondition("Building.id", req.query.BuildingID),
             ...addCondition("Org.id", req.query.OrgID),
-            ...addCondition("Seat", req.query.Seat, false, true), //greater than
             ...addCondition("Size", req.query.Size, true),
             ...{ active: { $ne: false } },
         };
+
+        if (req.query.Seat) {
+            match.Seat = {
+                $gte: Number.parseInt(req.query.Seat),
+            }
+        }
 
         if (req.query.Object) {
             if (Array.isArray(req.query.Object)) {
