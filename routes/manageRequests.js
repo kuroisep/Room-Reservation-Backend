@@ -25,6 +25,8 @@ router.post('/', async (req, res) => {
 
     for(let i=0; i<start.length; i++){
 
+        console.log(start[i][0])
+
         timeoverlap = await EventModel.find({
             "$and": [{ "Room.id": req.body.Room }],
             "$or": [
@@ -171,6 +173,27 @@ router.put("/:id", async (req, res) => {
 
         if (request.Status_Approve == 'Approved') {
           //  console.log(request.startTime.length)
+            let timeoverlap;
+            const start = request.startTime
+            const end = request.endTime
+            for(let i=0; i<start.length; i++) {
+                timeoverlap = await EventModel.find({
+                    "$and": [{ "Room.id": req.body.Room }],
+                    "$or": [
+                        {"$and": [{ startTime: { $lte: start[i][0] }}, { endTime: { $gte: end[i][0] }}]},
+                        {"$and": [{ startTime: { $gte: start[i][0] }}, { endTime: { $lte: end[i][0] }}]},
+                        {"$and": [{ startTime: { $gte: start[i][0] }}, { startTime: { $lte: end[i][0] }}]},
+                        {"$and": [{ endTime: { $gte: end[i][0] }}, {endTime: { $lte: end [i][0]}}]}
+                    ]
+                })
+            }
+            console.log(timeoverlap)
+
+            if (timeoverlap.length > 0) {
+                res.status(500).send('This room has been reserved')
+            }
+            else {
+
             for (let i = 0; i < request.startTime.length; i++) {
                 const Event = new EventModel({
                     Room: request.Room,
@@ -192,6 +215,7 @@ router.put("/:id", async (req, res) => {
             const room = await RoomModel.findById(request.Room.id)
             room.useCount = (room.useCount) + 1
             await room.save()
+            }
         }
         if (req.body.Seat) {
             request.Seat = req.body.Seat
