@@ -305,14 +305,15 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
 
     if (req.body.Building && req.body.Building != room.Building.id) {
         const BuildNew = await BuildingModel.findById(req.body.Building)
+        const OrgNew = await OrgModel.findById(BuildNew.org.id)
 
         room.Building = {
             id: BuildNew._id,
             name: BuildNew.name
         }
         room.Org = {
-            id: BuildNew.org._id,
-            name: BuildNew.org.name
+            id: OrgNew._id,
+            name: OrgNew.name
         }
 
         BuildOld = await BuildingModel.findById(room.Building.id)
