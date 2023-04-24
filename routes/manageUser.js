@@ -256,7 +256,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
         }
 
         StatusNew.userID.push(user._id)
-        OrgNew.userID.push(user._id)
+        OrgNew.userID.push(user._id.toString())
     }
     if (req.body.org && req.body.org !== user.org.id) {
 
@@ -269,7 +269,7 @@ router.put("/:id", upload.single('image'), async (req, res) => {
             name: OrgNew.name
         }
 
-        OrgNew.userID.push(user._id)
+        OrgNew.userID.push(user._id.toString())
     }
     if (req.body.role) {
         const newrole = req.body.role
