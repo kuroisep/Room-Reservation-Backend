@@ -239,18 +239,19 @@ router.put("/:id", upload.single('image'), async (req, res) => {
 
         StatusOld = await StatusModel.findById(user.status.id)
         StatusOld.userID = StatusOld.userID.filter(e => e !== user._id.toString())
-        OrgOld = await OrgModel.findById(user.org.id)
+        OrgOld = await OrgModel.findOne({name: StatusOld.org.name})
         OrgOld.userID = OrgOld.userID.filter(e => e !== user._id.toString())
 
         StatusNew = await StatusModel.findById(req.body.status)
-        OrgNew = await OrgModel.findById(StatusNew.org.id)
+        OrgNew = await OrgModel.findOne({name : StatusNew.org.name})
+        console.log(OrgNew)
 
         user.status = {
             id: req.body.status,
             name: StatusNew.name
         }
         user.org = {
-            id: req.body.org,
+            id: OrgNew._id,
             name: OrgNew.name
         }
 
