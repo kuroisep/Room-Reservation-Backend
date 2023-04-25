@@ -318,6 +318,8 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
 
         BuildOld = await BuildingModel.findById(room.Building.id)
         BuildOld.roomID = BuildOld.roomID.filter(e => e !== room._id.toString())
+        BuildNew.roomID.push(room._id.toString())
+        await BuildNew.save()
      //   OrgOld = await OrgModel.findOne({name:room.Org.name})
      //   console.log(room.Org)
      //   OrgOld.roomID = OrgOld.roomID.filter(e => e !== room._id.toString())
