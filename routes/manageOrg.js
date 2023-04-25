@@ -139,7 +139,7 @@ router.get('/roomtype/:id', async (req, res) => {
     const org = await OrgModel.findOne({ _id: id })
 
     const roomtype = org.roomtypeID
-    RoomTypeModel.find({ _id: { $in: room.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) }, active: true }).then(data => {
+    RoomTypeModel.find({ _id: { $in: roomtype.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) }, active: true }).then(data => {
         res.send(data)
     })
 })
