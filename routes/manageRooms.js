@@ -299,7 +299,6 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
         }
     }
 
-    let BuildOld;
     let OrgOld;
     let RoomTOld;
 
@@ -316,10 +315,11 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
             name: OrgNew.name
         }
 
-        BuildOld = await BuildingModel.findById(room.Building.id)
+        const BuildOld = await BuildingModel.findById(room.Building.id)
         BuildOld.roomID = BuildOld.roomID.filter(e => e !== room._id.toString())
         BuildNew.roomID.push(room._id.toString())
         await BuildNew.save()
+        await BuildOld.save()
      //   OrgOld = await OrgModel.findOne({name:room.Org.name})
      //   console.log(room.Org)
      //   OrgOld.roomID = OrgOld.roomID.filter(e => e !== room._id.toString())
@@ -351,7 +351,7 @@ router.put("/room/:id", upload.single('image'), async (req, res) => {
 
     try {
         await room.save();
-        await BuildOld?.save();
+  //      await BuildOld?.save();
         await OrgOld?.save();
         await RoomTOld?.save()
         res.send("updated");
