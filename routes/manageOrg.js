@@ -8,6 +8,7 @@ const UserModel = require('../models/Users');
 const StatusModel = require('../models/Status');
 const EventModel = require('../models/Event')
 const RoomTypeModel = require('../models/RoomType')
+const RoomModel = require('../models/Rooms')
 const RequestModel = require('../models/Requests')
 
 router.post('/', async (req, res) => {
@@ -137,8 +138,18 @@ router.get('/roomtype/:id', async (req, res) => {
     const id = req.params.id
     const org = await OrgModel.findOne({ _id: id })
 
-    const roomtype = org.roomTypeID
-    RoomTypeModel.find({ _id: { $in: roomtype.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) }, active: true }).then(data => {
+    const roomtype = org.roomtypeID
+    RoomTypeModel.find({ _id: { $in: room.map((roomtype) => new mongoose.Types.ObjectId(roomtype)) }, active: true }).then(data => {
+        res.send(data)
+    })
+})
+
+router.get('/room/:id', async (req, res) => {
+    const id = req.params.id
+    const org = await OrgModel.findOne({ _id: id })
+
+    const room = org.roomID
+    RoomModel.find({ _id: { $in: room.map((room) => new mongoose.Types.ObjectId(room)) }, active: true }).then(data => {
         res.send(data)
     })
 })
