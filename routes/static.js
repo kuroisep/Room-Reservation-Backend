@@ -113,7 +113,7 @@ router.get('/searchby/', async (req, res) => {
             },
         }
 
-        const aggregate = RequestsModel.aggregate();
+        const aggregate = EventModel.aggregate();
         aggregate.match(match);
         if (showUseMinute) {
             aggregate.addFields({
