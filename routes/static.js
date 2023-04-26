@@ -82,7 +82,7 @@ router.get('/searchby/', async (req, res) => {
 
         let match = {
             ...addCondition("Room.id", req.query.RoomID),
-            ...addCondition("Roomtype.id", req.query.RoomTypeID),
+            ...addCondition("RoomType.id", req.query.RoomTypeID),
             ...addCondition("Building.id", req.query.BuildingID),
             ...addCondition("Org.id", req.query.OrgID),
             ...addCondition("User.id", req.query.UserID),
@@ -113,7 +113,7 @@ router.get('/searchby/', async (req, res) => {
             },
         }
 
-        const aggregate = EventModel.aggregate();
+        const aggregate = RequestsModel.aggregate();
         aggregate.match(match);
         if (showUseMinute) {
             aggregate.addFields({
